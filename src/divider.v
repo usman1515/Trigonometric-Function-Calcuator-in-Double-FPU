@@ -17,22 +17,14 @@ always @(posedge clk ) begin
         if (en_divider) begin
             data_out <= data_in % divisor;
 			// --------------------------------------- 
-			if(data_in >= 'd0 && data_in <= 'd90) begin
+			if(data_out >= 'd0 && data_out <= 'd90 || data_out == 'd360) begin
                 quadrant <= 2'd0;
-			end
-			else if(data_in >= 'd91 && data_in <= 'd180) begin
+			else if(data_out >= 'd91 && data_out <= 'd180)
                 quadrant <= 2'd1;
-				// $display("Input angle [%3d] | Quadrant [%2d] | Data output [%3d]",data_in,quadrant,data_out);
-			end
-			else if(data_in >= 'd181 && data_in <= 'd270) begin
+			else if(data_out >= 'd181 && data_out <= 'd270)
                 quadrant <= 2'd2;
-				// $display("Input angle [%3d] | Quadrant [%2d] | Data output [%3d]",data_in,quadrant,data_out);
-			end
-			else if(data_in >= 'd271 && data_in <= 'd360) begin
+			else if(data_out >= 'd271 && data_out < 'd360)
                 quadrant <= 2'd3;
-				//$display("Input angle [%3d] | Quadrant [%2d] | Data output [%3d]",data_in,quadrant,data_out);
-			end
-            $display("Input angle [%3d] | Quadrant [%2d] | Data output [%3d]",data_in,quadrant,data_out);
         end
         else begin
             data_out <= 'dz;
