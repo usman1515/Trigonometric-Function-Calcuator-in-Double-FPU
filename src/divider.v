@@ -17,7 +17,7 @@ always @(posedge clk ) begin
         if (en_divider) begin
             data_out <= data_in % divisor;
 			// --------------------------------------- 
-			if(data_out >= 'd0 && data_out <= 'd90 || data_out == 'd360) begin
+			if(data_out >= 'd0 && data_out <= 'd90 || data_out == 'd360)
                 quadrant <= 2'd0;
 			else if(data_out >= 'd91 && data_out <= 'd180)
                 quadrant <= 2'd1;
