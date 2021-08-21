@@ -1,0 +1,8 @@
+Trigonometric_Function_Calcuator_in_Double_FPU.mpf
+Trigonometric_Function_Calcuator_in_Double_FPU.cr.mti
+transcript
+work/
+bin/
+test/*.bak
+src/*.bak
+vsim.wlf
