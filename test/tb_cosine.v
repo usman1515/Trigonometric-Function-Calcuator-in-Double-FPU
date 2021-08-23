@@ -1,4 +1,3 @@
-
 `include "src/defines.v"
 `timescale 1ns/100ps
 
@@ -69,7 +68,7 @@ initial begin
         end
         #T $display("Input angle [%3d] | Sign [%1b] | Sine DFPU value = %16h",data_in,data_out[63],data_out);
     end
-        
+    
     $display("-----------------------------------------------------------------\n");
     $finish;
 end
