@@ -6,3 +6,4 @@ bin/
 test/*.bak
 src/*.bak
 vsim.wlf
+vish_stacktrace.vstf
