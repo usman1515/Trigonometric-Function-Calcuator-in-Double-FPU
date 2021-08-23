@@ -18,7 +18,7 @@ reg     [`DATA_WIDTH-1 : 0]      data_in;
 wire    [(`DATA_WIDTH*2)-1 : 0]  data_out;
 
 // -------------------------------------------------------- module instantiation
-cosine_LUT DUT_cosineLUT(
+tangent_LUT DUT_tangentLUT(
     .clk        (clk        ),
     .reset_n    (reset_n    ),
     .en_tangent (en_tangent ),
@@ -75,8 +75,8 @@ end
 
 // -------------------------------------------------------- dump vcd
 initial begin
-    $dumpfile("bin/tb_cosine.vcd");
-    $dumpvars(0,DUT_cosineLUT);
+    $dumpfile("bin/tb_tangent.vcd");
+    $dumpvars(0,DUT_tangentLUT);
 end
 
 // -------------------------------------------------------- end of module
