@@ -6,6 +6,9 @@ PATH_DIVIDER	:= $(PRJ_DIR)/scripts/divider.sh
 PATH_SINE 		:= $(PRJ_DIR)/scripts/sine.sh
 PATH_COSINE 	:= $(PRJ_DIR)/scripts/cosine.sh
 PATH_TANGENT 	:= $(PRJ_DIR)/scripts/tangent.sh
+PATH_COSECANT	:= $(PRJ_DIR)/scripts/cosecant.sh
+PATH_SECANT 	:= $(PRJ_DIR)/scripts/secant.sh
+PATH_COTANGENT 	:= $(PRJ_DIR)/scripts/cotangent.sh
 
 # -------------------------------------------- defines
 help:
@@ -42,6 +45,15 @@ cosine:
 
 tangent:
 	bash $(PATH_TANGENT)
+
+cosecant:
+	bash $(PATH_COSECANT)
+
+secant:
+	bash $(PATH_SECANT)
+
+cotangent:
+	bash $(PATH_COTANGENT)
 
 clean:
 	clear
