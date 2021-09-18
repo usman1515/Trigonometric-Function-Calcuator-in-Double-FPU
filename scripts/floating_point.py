@@ -23,7 +23,7 @@ class IEEE754DFPU():
     __inputNum = float
     __wholeNumBin = str
     __decNumBin = str
-    
+    __base2Num = str
     
     spSign = str
     dpSign = str
@@ -39,14 +39,14 @@ class IEEE754DFPU():
         self.__inputNum = 0.0
         self.__wholeNumBin = ''
         self.__decNumBin = '0b'
+        self.__base2Num = ''
         
-        
-        self.spSign = str
-        self.dpSign = str
-        self.spExponent = str
-        self.dpExponent = str
-        self.spMantissa = str
-        self.dpMantissa = str
+        self.spSign = ''
+        self.dpSign = ''
+        self.spExponent = ''
+        self.dpExponent = ''
+        self.spMantissa = ''
+        self.dpMantissa = ''
     
     
     # setup arguments for class
@@ -104,8 +104,32 @@ class IEEE754DFPU():
         # print verbosity
         if self.__myargs.verbose:
             print('Input Number: ',self.__inputNum)
-            print('{:^5s}{:>10d} (10) ---> {:<15s} (2)'.format(' ',int(wholeNum),self.__wholeNumBin))
-            print('{:^5s}{:>10f} (10) ---> {:<15s} (2)'.format(' ',decNum,self.__decNumBin))
+            print('{:^5s}{:<10d} (10) ---> {:<15s} (2)'.format(' ',int(wholeNum),self.__wholeNumBin))
+            print('{:^5s}{:<10f} (10) ---> {:<15s} (2)'.format(' ',decNum,self.__decNumBin))
+    
+    
+    # convert bin num to base 2 scientific notation
+    def base2Scientific(self):
+        # concatenate whole num and dec num
+        self.__base2Num = str(self.__wholeNumBin + '.' + self.__decNumBin).replace('0b','')
+        # convert to base 2
+        decPlaces = self.__base2Num.index('.') - 1
+        tempList = list(self.__base2Num)
+        tempList.remove('.')
+        tempList.insert(1,'.')
+        self.__base2Num = ''
+        self.__base2Num = self.__base2Num.join(tempList)
+        tempList.clear()
+        # print verbosity
+        if self.__myargs.verbose:
+            print('{:^5s}{:<10f} (10) ---> {:<15s} (2)'.format(' ',self.__inputNum,self.__base2Num))
+            print('{:^5s}Decimal places = {:>5f}'.format(' ',int(decPlaces)))
+    
+    
+    # calculate the exponent bias
+    def expoBias(self):
+        pass
+
 
 # =============================================================================
 # ================================= End Class =================================
@@ -120,6 +144,10 @@ def main():
     obj1.getPrecison()
     # convert dec num to bin num
     obj1.convertInputNum2Bin(number=85.125)
+    # combine bin num to base 2 notation
+    obj1.base2Scientific()
+    # get exponent bias
+    obj1.expoBias()
 
 
 if __name__ == '__main__':
