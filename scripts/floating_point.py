@@ -135,17 +135,17 @@ class IEEE754DFPU():
             self.dpSign = '0'
             # print verbosity
             if self.__myargs.verbose:
-                print("     Sign bit = 1'b0")
+                print("     Sign bit:       1'b0")
         else:
             self.spSign = '1'
             self.dpSign = '1'
             # print verbosity
             if self.__myargs.verbose:
-                print("     Sign bit = 1'b1")
+                print("     Sign bit:       1'b1")
     
     
-    # calculate the exponent bias
-    def expoBias(self):
+    # calculate the exponent bias and display in binary format
+    def getexpoBias(self):
         if self.__myargs.doubleprecison == 1:
             self.dpExponent += self.__decPlaces
             # print verbosity
@@ -160,6 +160,22 @@ class IEEE754DFPU():
                 print('{:^5s}{:<15d} (10) ---> {:<15s} (2)'.format(' ',int(self.spExponent),bin(self.spExponent)))
     
     
+    # caculate the mantissa and display in binary format
+    def getMantissa(self):
+        w, tempMantissa = self.__base2Num.split('.')
+        if self.__myargs.doubleprecison == 1:
+            self.dpMantissa = tempMantissa.ljust(52,'0')
+            # print verbosity
+            if self.__myargs.verbose:
+                print('{:^5s}Mantissa:       0b{:<52s} (2)'.format(' ',self.dpMantissa))
+        elif self.__myargs.singleprecison == 1:
+            self.spMantissa = tempMantissa.ljust(23,'0')
+            # print verbosity
+            if self.__myargs.verbose:
+                print('{:^5s}Mantissa:       0b{:<23s} (2)'.format(' ',self.spMantissa))
+
+        print(len(self.dpMantissa),len(self.spMantissa))
+        print(len(bin(self.dpExponent)),len(bin(self.spExponent)))
 
 
 
@@ -181,8 +197,9 @@ def main():
     # find if number +ve/-ve
     obj1.getSign()
     # get exponent bias
-    obj1.expoBias()
-
+    obj1.getexpoBias()
+    # get mantissa
+    obj1.getMantissa()
 
 if __name__ == '__main__':
     main()
