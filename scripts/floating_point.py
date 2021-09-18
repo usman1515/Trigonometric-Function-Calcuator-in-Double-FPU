@@ -128,10 +128,24 @@ class IEEE754DFPU():
             print('{:^5s}Decimal places: {:<5d}'.format(' ',int(self.__decPlaces)))
     
     
+    # Determine sign of the number and display in binary format
+    def getSign(self):
+        if self.__inputNum >= 0:    
+            self.spSign = '0'
+            self.dpSign = '0'
+            # print verbosity
+            if self.__myargs.verbose:
+                print("     Sign bit = 1'b0")
+        else:
+            self.spSign = '1'
+            self.dpSign = '1'
+            # print verbosity
+            if self.__myargs.verbose:
+                print("     Sign bit = 1'b1")
+    
+    
     # calculate the exponent bias
     def expoBias(self):
-        print('sp: ',self.__myargs.singleprecison)
-        print('dp: ',self.__myargs.doubleprecison)
         if self.__myargs.doubleprecison == 1:
             self.dpExponent += self.__decPlaces
             # print verbosity
@@ -144,6 +158,8 @@ class IEEE754DFPU():
             if self.__myargs.verbose:
                 print('{:^5s}Exponent bias:  {:<5d}'.format(' ',int(self.spExponent)))
                 print('{:^5s}{:<15d} (10) ---> {:<15s} (2)'.format(' ',int(self.spExponent),bin(self.spExponent)))
+    
+    
 
 
 
@@ -162,6 +178,8 @@ def main():
     obj1.convertInputNum2Bin(number=85.125)
     # combine bin num to base 2 notation
     obj1.base2Scientific()
+    # find if number +ve/-ve
+    obj1.getSign()
     # get exponent bias
     obj1.expoBias()
 
