@@ -209,6 +209,16 @@ class IEEE754DFPU():
             self.spHexNum = hex(int(self.spBinNum,2))
             # print(len(self.spBinNum),self.spBinNum,self.spHexNum)
             print('Output Number: {:<18s} (16) ---> {:<34s} (2)'.format(self.spHexNum,self.spBinNum))
+    
+    
+    # convert decimal number to IEEE foat point conversion
+    def dec2IeeeFloatPoint(self,number):
+        self.convertInputNum2Bin(number)
+        self.base2Scientific()
+        self.getSign()
+        self.getexpoBias()
+        self.getMantissa()
+        self.combineAll()
 
 
 # =============================================================================
@@ -222,23 +232,9 @@ def main():
     obj1.setArguments()
     # set precison level
     obj1.getPrecison()
-    # convert dec num to bin num
-    obj1.convertInputNum2Bin(number=85.125)
-    # combine bin num to base 2 notation
-    obj1.base2Scientific()
-    # find if number +ve/-ve
-    obj1.getSign()
-    # get exponent bias
-    obj1.getexpoBias()
-    # get mantissa
-    obj1.getMantissa()
-    # combine sign, expo, mantissa
-    obj1.combineAll()
+    # convert decimal number to IEEE foat point conversion
+    obj1.dec2IeeeFloatPoint(number=85.125)
 
 
 if __name__ == '__main__':
     main()
-
-
-4055480000000000
-4055480000000000
