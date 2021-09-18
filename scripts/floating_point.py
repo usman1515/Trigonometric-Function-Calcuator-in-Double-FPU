@@ -24,11 +24,12 @@ class IEEE754DFPU():
     __wholeNumBin = str
     __decNumBin = str
     __base2Num = str
+    __decPlaces = int
     
     spSign = str
     dpSign = str
-    spExponent = str
-    dpExponent = str
+    spExponent = int
+    dpExponent = int
     spMantissa = str
     dpMantissa = str
     
@@ -40,11 +41,12 @@ class IEEE754DFPU():
         self.__wholeNumBin = ''
         self.__decNumBin = '0b'
         self.__base2Num = ''
+        self.__decPlaces = 0
         
         self.spSign = ''
         self.dpSign = ''
-        self.spExponent = ''
-        self.dpExponent = ''
+        self.spExponent = 127
+        self.dpExponent = 1023
         self.spMantissa = ''
         self.dpMantissa = ''
     
@@ -104,8 +106,8 @@ class IEEE754DFPU():
         # print verbosity
         if self.__myargs.verbose:
             print('Input Number: ',self.__inputNum)
-            print('{:^5s}{:<10d} (10) ---> {:<15s} (2)'.format(' ',int(wholeNum),self.__wholeNumBin))
-            print('{:^5s}{:<10f} (10) ---> {:<15s} (2)'.format(' ',decNum,self.__decNumBin))
+            print('{:^5s}{:<15d} (10) ---> {:<15s} (2)'.format(' ',int(wholeNum),self.__wholeNumBin))
+            print('{:^5s}{:<15f} (10) ---> {:<15s} (2)'.format(' ',decNum,self.__decNumBin))
     
     
     # convert bin num to base 2 scientific notation
@@ -113,7 +115,7 @@ class IEEE754DFPU():
         # concatenate whole num and dec num
         self.__base2Num = str(self.__wholeNumBin + '.' + self.__decNumBin).replace('0b','')
         # convert to base 2
-        decPlaces = self.__base2Num.index('.') - 1
+        self.__decPlaces = self.__base2Num.index('.') - 1
         tempList = list(self.__base2Num)
         tempList.remove('.')
         tempList.insert(1,'.')
@@ -122,13 +124,27 @@ class IEEE754DFPU():
         tempList.clear()
         # print verbosity
         if self.__myargs.verbose:
-            print('{:^5s}{:<10f} (10) ---> {:<15s} (2)'.format(' ',self.__inputNum,self.__base2Num))
-            print('{:^5s}Decimal places = {:>5f}'.format(' ',int(decPlaces)))
+            print('{:^5s}{:<15f} (10) ---> {:<15s} (2)'.format(' ',self.__inputNum,self.__base2Num))
+            print('{:^5s}Decimal places: {:<5d}'.format(' ',int(self.__decPlaces)))
     
     
     # calculate the exponent bias
     def expoBias(self):
-        pass
+        print('sp: ',self.__myargs.singleprecison)
+        print('dp: ',self.__myargs.doubleprecison)
+        if self.__myargs.doubleprecison == 1:
+            self.dpExponent += self.__decPlaces
+            # print verbosity
+            if self.__myargs.verbose:
+                print('{:^5s}Exponent bias:  {:<5d}'.format(' ',int(self.dpExponent)))
+                print('{:^5s}{:<15d} (10) ---> {:<15s} (2)'.format(' ',int(self.dpExponent),bin(self.dpExponent)))
+        elif self.__myargs.singleprecison == 1:
+            self.spExponent +=  self.__decPlaces
+            # print verbosity
+            if self.__myargs.verbose:
+                print('{:^5s}Exponent bias:  {:<5d}'.format(' ',int(self.spExponent)))
+                print('{:^5s}{:<15d} (10) ---> {:<15s} (2)'.format(' ',int(self.spExponent),bin(self.spExponent)))
+
 
 
 # =============================================================================
