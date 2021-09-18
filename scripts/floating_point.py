@@ -25,13 +25,16 @@ class IEEE754DFPU():
     __decNumBin = str
     __base2Num = str
     __decPlaces = int
-    
-    spSign = str
-    dpSign = str
-    spExponent = int
-    dpExponent = int
-    spMantissa = str
-    dpMantissa = str
+    __spSign = str
+    __dpSign = str
+    __spExponent = int
+    __dpExponent = int
+    __spMantissa = str
+    __dpMantissa = str
+    spBinNum = str
+    spHexNum = str
+    dpBinNum = str
+    dpHexNum = str
     
     # ----------------------------------------------------------------------------- Functions
     # constructor
@@ -42,13 +45,16 @@ class IEEE754DFPU():
         self.__decNumBin = '0b'
         self.__base2Num = ''
         self.__decPlaces = 0
-        
-        self.spSign = ''
-        self.dpSign = ''
-        self.spExponent = 127
-        self.dpExponent = 1023
-        self.spMantissa = ''
-        self.dpMantissa = ''
+        self.__spSign = ''
+        self.__dpSign = ''
+        self.__spExponent = 127
+        self.__dpExponent = 1023
+        self.__spMantissa = ''
+        self.__dpMantissa = ''
+        self.spBinNum = '0b'
+        self.spHexNum = ''
+        self.dpBinNum = '0b'
+        self.dpHexNum = ''
     
     
     # setup arguments for class
@@ -131,14 +137,14 @@ class IEEE754DFPU():
     # Determine sign of the number and display in binary format
     def getSign(self):
         if self.__inputNum >= 0:    
-            self.spSign = '0'
-            self.dpSign = '0'
+            self.__spSign = '0'
+            self.__dpSign = '0'
             # print verbosity
             if self.__myargs.verbose:
                 print("     Sign bit:       1'b0")
         else:
-            self.spSign = '1'
-            self.dpSign = '1'
+            self.__spSign = '1'
+            self.__dpSign = '1'
             # print verbosity
             if self.__myargs.verbose:
                 print("     Sign bit:       1'b1")
@@ -147,36 +153,47 @@ class IEEE754DFPU():
     # calculate the exponent bias and display in binary format
     def getexpoBias(self):
         if self.__myargs.doubleprecison == 1:
-            self.dpExponent += self.__decPlaces
+            self.__dpExponent += self.__decPlaces
             # print verbosity
             if self.__myargs.verbose:
-                print('{:^5s}Exponent bias:  {:<5d}'.format(' ',int(self.dpExponent)))
-                print('{:^5s}{:<15d} (10) ---> {:<15s} (2)'.format(' ',int(self.dpExponent),bin(self.dpExponent)))
+                print('{:^5s}Exponent bias:  {:<5d}'.format(' ',int(self.__dpExponent)))
+                print('{:^5s}{:<15d} (10) ---> {:<15s} (2)'.format(' ',int(self.__dpExponent),bin(self.__dpExponent)))
         elif self.__myargs.singleprecison == 1:
-            self.spExponent +=  self.__decPlaces
+            self.__spExponent +=  self.__decPlaces
             # print verbosity
             if self.__myargs.verbose:
-                print('{:^5s}Exponent bias:  {:<5d}'.format(' ',int(self.spExponent)))
-                print('{:^5s}{:<15d} (10) ---> {:<15s} (2)'.format(' ',int(self.spExponent),bin(self.spExponent)))
+                print('{:^5s}Exponent bias:  {:<5d}'.format(' ',int(self.__spExponent)))
+                print('{:^5s}{:<15d} (10) ---> {:<15s} (2)'.format(' ',int(self.__spExponent),bin(self.__spExponent)))
     
     
     # caculate the mantissa and display in binary format
     def getMantissa(self):
         w, tempMantissa = self.__base2Num.split('.')
         if self.__myargs.doubleprecison == 1:
-            self.dpMantissa = tempMantissa.ljust(52,'0')
+            self.__dpMantissa = tempMantissa.ljust(52,'0')
             # print verbosity
             if self.__myargs.verbose:
-                print('{:^5s}Mantissa:       0b{:<52s} (2)'.format(' ',self.dpMantissa))
+                print('{:^5s}Mantissa:       0b{:<52s} (2)'.format(' ',self.__dpMantissa))
         elif self.__myargs.singleprecison == 1:
-            self.spMantissa = tempMantissa.ljust(23,'0')
+            self.__spMantissa = tempMantissa.ljust(23,'0')
             # print verbosity
             if self.__myargs.verbose:
-                print('{:^5s}Mantissa:       0b{:<23s} (2)'.format(' ',self.spMantissa))
-
-        print(len(self.dpMantissa),len(self.spMantissa))
-        print(len(bin(self.dpExponent)),len(bin(self.spExponent)))
-
+                print('{:^5s}Mantissa:       0b{:<23s} (2)'.format(' ',self.__spMantissa))
+    
+    
+    # combine all parts
+    def combineAll(self):
+        print('mantissa len: ',len(self.__dpMantissa),len(self.__spMantissa))
+        if self.__myargs.doubleprecison == 1:
+            self.__dpExponent = bin(self.__dpExponent).replace('0b','')
+            if len(self.__dpExponent) == 11:
+                self.dpBinNum += self.__dpSign + self.__dpExponent + self.__dpMantissa
+                # print(len(self.dpBinNum),self.dpBinNum)
+        elif self.__myargs.singleprecison == 1:
+            self.__spExponent = bin(self.__spExponent).replace('0b','')
+            if len(self.__spExponent) == 8:
+                self.spBinNum += self.__spSign + self.__spExponent + self.__spMantissa
+                # print(len(self.spBinNum),self.spBinNum)
 
 
 # =============================================================================
@@ -200,6 +217,9 @@ def main():
     obj1.getexpoBias()
     # get mantissa
     obj1.getMantissa()
+    # combine sign, expo, mantissa
+    obj1.combineAll()
+
 
 if __name__ == '__main__':
     main()
