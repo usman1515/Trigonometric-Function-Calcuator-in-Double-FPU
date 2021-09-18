@@ -48,23 +48,31 @@ class IEEE754DFPU():
         self.__myargs = parser.parse_args()
     
     
-    # get precison level ie sp/dp
+    # set precison level i.e single or double
     def getPrecison(self):
-        pass
-
-
+        if self.__myargs.singleprecison == 1:
+            self.__myargs.doubleprecison = 0
+        elif self.__myargs.doubleprecison == 1:
+            self.__myargs.singleprecison = 0
+        else:
+            self.__myargs.doubleprecison = 1
+            self.__myargs.singleprecison = 0
+        if self.__myargs.verbose:
+            print('Single Precison: ',self.__myargs.singleprecison)
+            print('Double Precison: ',self.__myargs.doubleprecison)
 
 # =============================================================================
 # ================================= End Class =================================
 # =============================================================================
 
 def main():
-    # 
+    # create class object
     obj1 = IEEE754DFPU()
-    # 
+    # setup arguments for class 
     obj1.setArguments()
+    # set precison level
     obj1.getPrecison()
-    # print(type(obj1.__myargs))
+
 
 if __name__ == '__main__':
     main()
