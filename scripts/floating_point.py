@@ -71,7 +71,8 @@ class IEEE754DFPU():
                             type=int,default=0,metavar='',required=False,nargs='?',help='Set output value to have single precision')        
         parser.add_argument('-num','--inputvalue',
                         type=float,default=0,metavar='',required=False,nargs='?',help='Input user defined decimal value')
-        group = parser.add_mutually_exclusive_group()
+        parser.add_argument('-sign','--signbit',
+                            type=int,default=0,metavar='',required=False,help='Include sign bit in hex num')
         parser.add_argument('-v','--verbose',
                             type=int,default=0,metavar='',required=False,nargs='?',help='print verbose')
         self.__myargs = parser.parse_args()
@@ -109,9 +110,9 @@ class IEEE754DFPU():
             tempdecNum *= 2
             # print('Each dec num stage: ',tempdecNum,int(tempdecNum))
             self.__decNumBin += str(int(tempdecNum))
+        print('Input Number:  {:<18f} (10)'.format(self.__inputNum))
         # print verbosity
         if self.__myargs.verbose:
-            print('Input Number: ',self.__inputNum)
             print('{:^5s}{:<15d} (10) ---> {:<15s} (2)'.format(' ',int(wholeNum),self.__wholeNumBin))
             print('{:^5s}{:<15f} (10) ---> {:<15s} (2)'.format(' ',decNum,self.__decNumBin))
     
@@ -183,17 +184,31 @@ class IEEE754DFPU():
     
     # combine all parts
     def combineAll(self):
-        print('mantissa len: ',len(self.__dpMantissa),len(self.__spMantissa))
+        # for double precision
         if self.__myargs.doubleprecison == 1:
             self.__dpExponent = bin(self.__dpExponent).replace('0b','')
-            if len(self.__dpExponent) == 11:
+            # dont include sign bit in hex
+            if self.__myargs.signbit == 0:
+                self.dpBinNum += self.__dpExponent + self.__dpMantissa
+            # include sign bit in hex
+            elif self.__myargs.signbit == 1:
                 self.dpBinNum += self.__dpSign + self.__dpExponent + self.__dpMantissa
-                # print(len(self.dpBinNum),self.dpBinNum)
+            self.dpHexNum = hex(int(self.dpBinNum,2))
+            # print(len(self.dpBinNum),self.dpBinNum,self.dpHexNum)
+            print('Output Number: {:<17s} (16) ---> {:<66s} (2)'.format(self.dpHexNum,self.dpBinNum))
+        
+        # for single precision
         elif self.__myargs.singleprecison == 1:
             self.__spExponent = bin(self.__spExponent).replace('0b','')
-            if len(self.__spExponent) == 8:
+            # dont include sign bit in hex
+            if self.__myargs.signbit == 0:
+                self.spBinNum += self.__spExponent + self.__spMantissa
+            # include sign bit in hex
+            elif self.__myargs.signbit == 1:
                 self.spBinNum += self.__spSign + self.__spExponent + self.__spMantissa
-                # print(len(self.spBinNum),self.spBinNum)
+            self.spHexNum = hex(int(self.spBinNum,2))
+            # print(len(self.spBinNum),self.spBinNum,self.spHexNum)
+            print('Output Number: {:<18s} (16) ---> {:<34s} (2)'.format(self.spHexNum,self.spBinNum))
 
 
 # =============================================================================
@@ -223,3 +238,7 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
+4055480000000000
+4055480000000000
