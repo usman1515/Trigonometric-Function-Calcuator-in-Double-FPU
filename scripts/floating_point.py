@@ -60,12 +60,12 @@ class IEEE754DFPU():
     
     # setup arguments for class
     def setArguments(self):
-        # set arguments for class IEEE754DFPU
+        # ---------- set arguments for class IEEE754DFPU
         parser = argparse.ArgumentParser(prog='IEEE-754 Double Floating Point Unit',
                                         usage='%(prog)s [options] path',
                                         description='IEEE-754 single and double precision hexadecimal floating point unit generator',
                                         epilog='Happy trigonometry :)')
-        # list of all possible args for IEEE754DFPU
+        # ---------- list of all possible args for IEEE754DFPU
         parser.add_argument('-dp','--doubleprecison',
                             type=int,default=1,metavar='',required=False,nargs='?',help='Set output value to have double precision')
         parser.add_argument('-sp','--singleprecison',
@@ -111,10 +111,11 @@ class IEEE754DFPU():
         tempdecNum = decNum
         while not tempdecNum >= 1:
             tempdecNum *= 2
-            # print('Each dec num stage: ',tempdecNum,' -> ',int(tempdecNum))
+            print('Each dec num stage: ',tempdecNum,' -> ',int(tempdecNum))
             self.__decNumBin += str(int(tempdecNum))
+            # ---------- total decimal places
         print('Input Number:{:^5s}{:.20f} (10)'.format(' ',self.__inputNum))
-        # print verbosity
+        # ---------- print verbosity
         if self.__myargs.verbose:
             print('{:^5s}{:<15d} (10) ---> {:<15s} (2)'.format(' ',int(wholeNum),self.__wholeNumBin))
             print('{:^5s}{:<15f} (10) ---> {:<15s} (2)'.format(' ',decNum,self.__decNumBin))
@@ -122,19 +123,29 @@ class IEEE754DFPU():
     
     # convert bin num to base 2 scientific notation
     def base2Scientific(self):
-        # concatenate whole num and dec num
+        # ---------- concatenate whole num and dec num
         self.__base2Num = str(self.__wholeNumBin + '.' + self.__decNumBin).replace('0b','')
-        # convert to base 2
-        self.__decPlaces = self.__base2Num.index('.') - 1
+        oldDotPos = self.__base2Num.index('.')
         tempList = list(self.__base2Num)
         tempList.remove('.')
-        tempList.insert(1,'.')
+        # ---------- check if MSB is 1'b1
+        if self.__base2Num[0] == '1':
+            # print('MSB is 1: ',self.__base2Num[0])
+            tempList.insert(1,'.')
+        # ---------- check if LSB is 1'b1
+        elif self.__base2Num[0] == '0' and self.__base2Num[-1] == '1':
+            # print('LSB is 1: ',self.__base2Num[-1])
+            tempList.insert(len(tempList),'.0')
+        # ---------- append dec point
         self.__base2Num = ''
         self.__base2Num = self.__base2Num.join(tempList)
         tempList.clear()
-        # print verbosity
+        newDotPos = self.__base2Num.index('.')
+        print('new ',newDotPos,'old ',oldDotPos)
+        self.__decPlaces = -1 * (newDotPos - oldDotPos)
+        # ---------- print verbosity
         if self.__myargs.verbose:
-            print('{:^5s}{:<15f} (10) ---> {:<15s} (2)'.format(' ',self.__inputNum,self.__base2Num))
+            print('{:^5s}{:<15f} (10) ---> {:<15s} (2)'.format(' ',float(self.__inputNum),self.__base2Num))
             print('{:^5s}Decimal places: {:<5d}'.format(' ',int(self.__decPlaces)))
     
     
@@ -217,7 +228,7 @@ class IEEE754DFPU():
     # convert decimal number to IEEE foat point conversion
     def dec2IeeeFloatPoint(self,number):
         self.convertInputNum2Bin(number)
-        #self.base2Scientific()
+        self.base2Scientific()
         #self.getSign()
         #self.getexpoBias()
         #self.getMantissa()
@@ -236,10 +247,8 @@ def main():
     # set precison level
     obj1.getPrecison()
     # convert decimal number to IEEE foat point conversion
-    number=math.sin(math.radians(1))
-    print('in num:  ',number)
-    obj1.dec2IeeeFloatPoint(number)
-
+    obj1.dec2IeeeFloatPoint(number=math.sin(math.radians(1)))
+    #obj1.dec2IeeeFloatPoint(number=85.125)
 
 if __name__ == '__main__':
     main()
@@ -247,3 +256,6 @@ if __name__ == '__main__':
 
 0.01745240643728351
 0.01745240643728351
+0b1111111111
+
+0b0000010000000000000000000000000000000000000000000000
