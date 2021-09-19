@@ -5,6 +5,7 @@ https://www.wikihow.com/Convert-a-Number-from-Decimal-to-IEEE-754-Floating-Point
 https://babbage.cs.qc.cuny.edu/IEEE-754.old/Decimal.html
 '''
 
+from decimal import *
 import argparse
 import logging
 import math
@@ -20,7 +21,7 @@ class IEEE754DFPU():
     
     # ----------------------------------------------------------------------------- Variables
     __myargs = argparse.Namespace
-    __inputNum = float
+    __inputNum = Decimal
     __wholeNumBin = str
     __decNumBin = str
     __base2Num = str
@@ -95,22 +96,24 @@ class IEEE754DFPU():
     
     # convert whole number to binary
     def convertInputNum2Bin(self,number):
-        # get num as arg or input
+        # ---------- get num as arg or input
         if self.__myargs.inputvalue:
-            self.__inputNum = self.__myargs.inputvalue
+            self.__inputNum = Decimal(self.__myargs.inputvalue)
         else:
-            self.__inputNum = number
-        # split input num
+            self.__inputNum = Decimal(number)
+        # print('Input dec num: ',self.__inputNum,type(self.__inputNum))
+        # ---------- split input num
         decNum, wholeNum = math.modf(self.__inputNum)
-        # convert whole num to binary
+        # print('Whole num: ',wholeNum,' Dec num: ',decNum)
+        # ---------- convert whole num to binary
         self.__wholeNumBin = bin(int(wholeNum))
-        # convert dec num to binary
+        # ---------- convert dec num to binary
         tempdecNum = decNum
         while not tempdecNum >= 1:
             tempdecNum *= 2
-            # print('Each dec num stage: ',tempdecNum,int(tempdecNum))
+            # print('Each dec num stage: ',tempdecNum,' -> ',int(tempdecNum))
             self.__decNumBin += str(int(tempdecNum))
-        print('Input Number:  {:<18f} (10)'.format(self.__inputNum))
+        print('Input Number:{:^5s}{:.20f} (10)'.format(' ',self.__inputNum))
         # print verbosity
         if self.__myargs.verbose:
             print('{:^5s}{:<15d} (10) ---> {:<15s} (2)'.format(' ',int(wholeNum),self.__wholeNumBin))
@@ -214,11 +217,11 @@ class IEEE754DFPU():
     # convert decimal number to IEEE foat point conversion
     def dec2IeeeFloatPoint(self,number):
         self.convertInputNum2Bin(number)
-        self.base2Scientific()
-        self.getSign()
-        self.getexpoBias()
-        self.getMantissa()
-        self.combineAll()
+        #self.base2Scientific()
+        #self.getSign()
+        #self.getexpoBias()
+        #self.getMantissa()
+        #self.combineAll()
 
 
 # =============================================================================
@@ -233,8 +236,14 @@ def main():
     # set precison level
     obj1.getPrecison()
     # convert decimal number to IEEE foat point conversion
-    obj1.dec2IeeeFloatPoint(number=85.125)
+    number=math.sin(math.radians(1))
+    print('in num:  ',number)
+    obj1.dec2IeeeFloatPoint(number)
 
 
 if __name__ == '__main__':
     main()
+
+
+0.01745240643728351
+0.01745240643728351
