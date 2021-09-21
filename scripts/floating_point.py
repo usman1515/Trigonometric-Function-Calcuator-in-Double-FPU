@@ -82,10 +82,12 @@ class IEEE754DFPU():
                             type=int,default=0,metavar='',required=False,help='Include sign bit in hex num')
         parser.add_argument('-v','--verbose',
                             type=int,default=0,metavar='',required=False,nargs='?',help='print verbose')
+        parser.add_argument('-d','--debug',
+                            type=int,default=0,metavar='',required=False,nargs='?',help='print debugging')
         self.__myargs = parser.parse_args()
     
     
-    # set precison level i.e single or double
+    # set precision level i.e single or double
     def getPrecison(self):
         if self.__myargs.singleprecison == 1:
             self.__myargs.doubleprecison = 0
@@ -96,8 +98,8 @@ class IEEE754DFPU():
             self.__myargs.singleprecison = 0
         # print verbosity
         if self.__myargs.verbose:
-            print('Single Precison: ',self.__myargs.singleprecison)
-            print('Double Precison: ',self.__myargs.doubleprecison)
+            print('Single Precision: ',self.__myargs.singleprecison)
+            print('Double Precision: ',self.__myargs.doubleprecison)
     
     
     # split input number into whole and dec
@@ -112,16 +114,34 @@ class IEEE754DFPU():
         self.__decNum, self.__wholeNum = math.modf(self.__inputNum)
         self.__wholeNum = int(self.__wholeNum)
         self.__decNum = Decimal(self.__decNum)
-        print('Length -> Whole num = [{0}] Decimal num = [{1}]'
-                .format(len(str(self.__wholeNum)),len(str(self.__decNum))))
+        # print('Length -> Whole num = [{0}] Decimal num = [{1}]'
+        #         .format(len(str(self.__wholeNum)),len(str(self.__decNum))))
     
     
-    # convvert whole num to bin
+    # convert whole num to bin
     def wholeNum2Bin(self):
         self.__wholeNumBin = bin(self.__wholeNum)
         # ---------- print verbosity
         if self.__myargs.verbose:
             print('{:^5s}{:<15d} (10) ---> {:<15s} (2)'.format(' ',self.__wholeNum,self.__wholeNumBin))
+    
+    
+    # convert dec num to bin
+    def decNum2Bin(self):
+        # ---------- change dec width to 32 bits
+        tempFloat = self.__decNum * 1
+        # ---------- multiply by 2 and store MSB in str
+        for i in range(len(str(tempFloat))):
+            tempFloat *= 2
+            bit, dump = str(tempFloat).split('.')
+            # print('Bit[{:>2d}]= {:^5s} ---> Temp float  =  {:f}'.format(i,bit,tempFloat))
+            self.__decNumBin += bit
+            # ---------- if tempFloat >= 1 change back to 0
+            if tempFloat >= 1.0:
+                tempFloat -= 1
+        # ---------- print verbosity
+        if self.__myargs.verbose:
+            print('{:^5s}{:<15f} (10) ---> {:<15s} (2)'.format(' ',float(self.__decNum),self.__decNumBin))
     
     
     # convert bin num to base 2 scientific notation
@@ -232,6 +252,7 @@ class IEEE754DFPU():
     def dec2IeeeFloatPoint(self,number):
         self.splitInputNum(number)
         self.wholeNum2Bin()
+        self.decNum2Bin()
         #self.base2Scientific()
         #self.getSign()
         #self.getexpoBias()
@@ -248,7 +269,7 @@ def main():
     obj1 = IEEE754DFPU()
     # setup arguments for class 
     obj1.setArguments()
-    # set precison level
+    # set precision level
     obj1.getPrecison()
     # convert decimal number to IEEE foat point conversion
     obj1.dec2IeeeFloatPoint(number=math.sin(math.radians(1)))
