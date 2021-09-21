@@ -114,8 +114,10 @@ class IEEE754DFPU():
         self.__decNum, self.__wholeNum = math.modf(self.__inputNum)
         self.__wholeNum = int(self.__wholeNum)
         self.__decNum = Decimal(self.__decNum)
-        # print('Length -> Whole num = [{0}] Decimal num = [{1}]'
-        #         .format(len(str(self.__wholeNum)),len(str(self.__decNum))))
+        # ---------- print debugging
+        if self.__myargs.debug:
+            print('{:<5s}---- Length -> Whole num = [{:d}] Decimal num = [{:d}]'
+                .format(' ',len(str(self.__wholeNum)),len(str(self.__decNum))))
     
     
     # convert whole num to bin
@@ -134,7 +136,9 @@ class IEEE754DFPU():
         for i in range(len(str(tempFloat))):
             tempFloat *= 2
             bit, dump = str(tempFloat).split('.')
-            # print('Bit[{:>2d}]= {:^5s} ---> Temp float  =  {:f}'.format(i,bit,tempFloat))
+            # ---------- print debugging
+            if self.__myargs.debug:
+                print('{:<5s}---- Bit[{:>2d}]= {:^5s} --> Temp float  =  {:f}'.format(' ',i,bit,tempFloat))
             self.__decNumBin += bit
             # ---------- if tempFloat >= 1 change back to 0
             if tempFloat >= 1.0:
