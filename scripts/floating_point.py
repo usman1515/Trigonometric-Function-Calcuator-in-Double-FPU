@@ -7,8 +7,8 @@ https://babbage.cs.qc.cuny.edu/IEEE-754.old/Decimal.html
 
 from decimal import *
 import argparse
-import logging
 import math
+import re
 import os
 os.system('clear')
 
@@ -150,38 +150,23 @@ class IEEE754DFPU():
     
     # concatenate whole num and dec num
     def joinBinNum(self):
-        self.__base2Num = str(self.__wholeNumBin + '.' + self.__decNumBin).replace('0b','')
+        self.__base2Num = '0b' + str(self.__wholeNumBin + '.' + self.__decNumBin).replace('0b','')
         # ---------- print verbosity
         if self.__myargs.verbose:
             print('{:^5s}{:<15f} (10) ---> {:<15s} (2)'.format(' ',float(self.__inputNum),self.__base2Num))
-
-
+    
     
     # convert bin num to base 2 scientific notation
     def base2Scientific(self):
-        # ---------- concatenate whole num and dec num
-        self.__base2Num = str(self.__wholeNumBin + '.' + self.__decNumBin).replace('0b','')
-        oldDotPos = self.__base2Num.index('.')
-        tempList = list(self.__base2Num)
-        tempList.remove('.')
-        # ---------- check if MSB is 1'b1
-        if self.__base2Num[0] == '1':
-            # print('MSB is 1: ',self.__base2Num[0])
-            tempList.insert(1,'.')
-        # ---------- check if LSB is 1'b1
-        elif self.__base2Num[0] == '0' and self.__base2Num[-1] == '1':
-            # print('LSB is 1: ',self.__base2Num[-1])
-            tempList.insert(len(tempList),'.0')
-        # ---------- append dec point
-        self.__base2Num = ''
-        self.__base2Num = self.__base2Num.join(tempList)
-        tempList.clear()
-        newDotPos = self.__base2Num.index('.')
-        print('new ',newDotPos,'old ',oldDotPos)
-        self.__decPlaces = -1 * (newDotPos - oldDotPos)
+        tempWnum, tempDnum = self.__base2Num.replace('0b','').split('.')
+        # ---------- check if num >= 1.0
+        if self.__wholeNum >= 1.0:
+            self.__decPlaces = len(tempWnum) - tempWnum.index('1') - 1
+        # ---------- check if num <= 1.0
+        else:
+            self.__decPlaces = -1 * (tempDnum.index('1') + 1)
         # ---------- print verbosity
         if self.__myargs.verbose:
-            print('{:^5s}{:<15f} (10) ---> {:<15s} (2)'.format(' ',float(self.__inputNum),self.__base2Num))
             print('{:^5s}Decimal places: {:<5d}'.format(' ',int(self.__decPlaces)))
     
     
@@ -267,7 +252,7 @@ class IEEE754DFPU():
         self.wholeNum2Bin()
         self.decNum2Bin()
         self.joinBinNum()
-        #self.base2Scientific()
+        self.base2Scientific()
         #self.getSign()
         #self.getexpoBias()
         #self.getMantissa()
