@@ -22,6 +22,8 @@ class IEEE754DFPU():
     # ----------------------------------------------------------------------------- Variables
     __myargs = argparse.Namespace
     __inputNum = Decimal
+    __wholeNum = int
+    __decNum = Decimal
     __wholeNumBin = str
     __decNumBin = str
     __base2Num = str
@@ -30,6 +32,8 @@ class IEEE754DFPU():
     __dpSign = str
     __spExponent = int
     __dpExponent = int
+    __spExponentBin = str
+    __dpExponentBin = str
     __spMantissa = str
     __dpMantissa = str
     spBinNum = str
@@ -42,6 +46,8 @@ class IEEE754DFPU():
     def __init__(self):
         self.__myargs = argparse.Namespace
         self.__inputNum = 0.0
+        self.__wholeNum = 0
+        self.__decNum = 0.0
         self.__wholeNumBin = ''
         self.__decNumBin = '0b'
         self.__base2Num = ''
@@ -94,32 +100,23 @@ class IEEE754DFPU():
             print('Double Precison: ',self.__myargs.doubleprecison)
     
     
-    # convert whole number to binary
-    def convertInputNum2Bin(self,number):
+    # split input number into whole and dec
+    def splitInputNum(self,number):
         # ---------- get num as arg or input
         if self.__myargs.inputvalue:
             self.__inputNum = Decimal(self.__myargs.inputvalue)
         else:
             self.__inputNum = Decimal(number)
-        # print('Input dec num: ',self.__inputNum,type(self.__inputNum))
+        print('Input dec num: ',self.__inputNum)
         # ---------- split input num
-        decNum, wholeNum = math.modf(self.__inputNum)
-        # print('Whole num: ',wholeNum,' Dec num: ',decNum)
-        # ---------- convert whole num to binary
-        self.__wholeNumBin = bin(int(wholeNum))
-        # ---------- convert dec num to binary
-        tempdecNum = decNum
-        while not tempdecNum >= 1:
-            tempdecNum *= 2
-            print('Each dec num stage: ',tempdecNum,' -> ',int(tempdecNum))
-            self.__decNumBin += str(int(tempdecNum))
-            # ---------- total decimal places
-        print('Input Number:{:^5s}{:.20f} (10)'.format(' ',self.__inputNum))
-        # ---------- print verbosity
-        if self.__myargs.verbose:
-            print('{:^5s}{:<15d} (10) ---> {:<15s} (2)'.format(' ',int(wholeNum),self.__wholeNumBin))
-            print('{:^5s}{:<15f} (10) ---> {:<15s} (2)'.format(' ',decNum,self.__decNumBin))
+        self.__decNum, self.__wholeNum = math.modf(self.__inputNum)
+        self.__wholeNum = int(self.__wholeNum)
+        self.__decNum = Decimal(self.__decNum)
+        print('Length -> Whole num = [{0}] Decimal num = [{1}]'
+                .format(len(str(self.__wholeNum)),len(str(self.__decNum))))
     
+    
+    # 
     
     # convert bin num to base 2 scientific notation
     def base2Scientific(self):
@@ -227,8 +224,8 @@ class IEEE754DFPU():
     
     # convert decimal number to IEEE foat point conversion
     def dec2IeeeFloatPoint(self,number):
-        self.convertInputNum2Bin(number)
-        self.base2Scientific()
+        self.splitInputNum(number)
+        #self.base2Scientific()
         #self.getSign()
         #self.getexpoBias()
         #self.getMantissa()
@@ -254,8 +251,10 @@ if __name__ == '__main__':
     main()
 
 
-0.01745240643728351
-0.01745240643728351
-0b1111111111
 
-0b0000010000000000000000000000000000000000000000000000
+# print('len is ',len(str('1.0001110111110000101100101011100010011101110100011110')))
+# 0.01745240643728351
+
+# 1.0001110111110000101100101011100010011101110100011110
+# 0.017452406437283511653202339175550150685012340545654296875
+# 0.01745240643728351
