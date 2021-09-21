@@ -148,6 +148,15 @@ class IEEE754DFPU():
             print('{:^5s}{:<15f} (10) ---> {:<15s} (2)'.format(' ',float(self.__decNum),self.__decNumBin))
     
     
+    # concatenate whole num and dec num
+    def joinBinNum(self):
+        self.__base2Num = str(self.__wholeNumBin + '.' + self.__decNumBin).replace('0b','')
+        # ---------- print verbosity
+        if self.__myargs.verbose:
+            print('{:^5s}{:<15f} (10) ---> {:<15s} (2)'.format(' ',float(self.__inputNum),self.__base2Num))
+
+
+    
     # convert bin num to base 2 scientific notation
     def base2Scientific(self):
         # ---------- concatenate whole num and dec num
@@ -257,6 +266,7 @@ class IEEE754DFPU():
         self.splitInputNum(number)
         self.wholeNum2Bin()
         self.decNum2Bin()
+        self.joinBinNum()
         #self.base2Scientific()
         #self.getSign()
         #self.getexpoBias()
