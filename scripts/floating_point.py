@@ -116,7 +116,13 @@ class IEEE754DFPU():
                 .format(len(str(self.__wholeNum)),len(str(self.__decNum))))
     
     
-    # 
+    # convvert whole num to bin
+    def wholeNum2Bin(self):
+        self.__wholeNumBin = bin(self.__wholeNum)
+        # ---------- print verbosity
+        if self.__myargs.verbose:
+            print('{:^5s}{:<15d} (10) ---> {:<15s} (2)'.format(' ',self.__wholeNum,self.__wholeNumBin))
+    
     
     # convert bin num to base 2 scientific notation
     def base2Scientific(self):
@@ -225,6 +231,7 @@ class IEEE754DFPU():
     # convert decimal number to IEEE foat point conversion
     def dec2IeeeFloatPoint(self,number):
         self.splitInputNum(number)
+        self.wholeNum2Bin()
         #self.base2Scientific()
         #self.getSign()
         #self.getexpoBias()
