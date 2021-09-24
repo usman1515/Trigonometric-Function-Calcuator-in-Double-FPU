@@ -5,6 +5,12 @@ https://www.wikihow.com/Convert-a-Number-from-Decimal-to-IEEE-754-Floating-Point
 https://babbage.cs.qc.cuny.edu/IEEE-754.old/Decimal.html
 '''
 
+# ! ========================================
+# ! single precision is still WORK IN PROGRESS
+# ! double precision works FINE
+# TODO: fix single precision
+# ! ========================================
+
 from decimal import *
 import argparse
 import math
@@ -261,7 +267,7 @@ class IEEE754DFPU():
             self.dpHexNum = hex(int(self.dpBinNum,2))
             # ---------- print verbosity
             if self.__myargs.verbose:
-                print('Output Number = {:<s} (2)'.format(self.dpBinNum))
+                print('{:^5s}{:<21s}{:<s} (2)'.format(' ','Output Number = ',self.dpBinNum))
             # print(len(self.dpBinNum),self.dpBinNum,self.dpHexNum)
             print('Output Number:  {:<s} (16)'.format(self.dpHexNum))
         
@@ -277,7 +283,7 @@ class IEEE754DFPU():
             self.spHexNum = hex(int(self.spBinNum,2))
             # ---------- print verbosity
             if self.__myargs.verbose:
-                print('Output Number = {:<s} (2)\n'.format(self.spBinNum))
+                print('{:^5s}{:<21s}{:<s} (2)\n'.format(' ','Output Number = ',self.spBinNum))
             # print(len(self.dpBinNum),self.dpBinNum,self.dpHexNum)
             print('Output Number:  {:<s} (16) \n'.format(self.spHexNum))
     
@@ -302,24 +308,3 @@ class IEEE754DFPU():
 # =============================================================================
 # ================================= End Class =================================
 # =============================================================================
-
-def main():
-    # create class object
-    obj1 = IEEE754DFPU()
-    # setup arguments for class 
-    obj1.setArguments()
-    # set precision level
-    obj1.getPrecison()
-    # convert decimal number to IEEE foat point conversion
-    number = math.sin(math.radians(5))
-    num = obj1.dec2IeeeFloatPoint(number)
-    print('\n\n\n',number,num)
-    #obj1.dec2IeeeFloatPoint(number=85.125)
-
-
-if __name__ == '__main__':
-    main()
-
-
-# 1 - 01111111001 - 00011101111100001011001010111000100111011101000111011 # mine
-# 0 - 01111111001 - 0001110111110000101100101011100010011101110100011110 # orignal
