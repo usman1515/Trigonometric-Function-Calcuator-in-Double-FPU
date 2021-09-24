@@ -98,8 +98,8 @@ class IEEE754DFPU():
             self.__myargs.singleprecison = 0
         # print verbosity
         if self.__myargs.verbose:
-            print('Single Precision: ',self.__myargs.singleprecison)
-            print('Double Precision: ',self.__myargs.doubleprecison)
+            print('{:<5s}{:<21s}{:<d}'.format(' ','Single Precision: ',self.__myargs.singleprecison))
+            print('{:<5s}{:<21s}{:<d}'.format(' ','Double Precision: ',self.__myargs.doubleprecison))
     
     
     # split input number into whole and dec
@@ -125,7 +125,7 @@ class IEEE754DFPU():
         self.__wholeNumBin = bin(self.__wholeNum)
         # ---------- print verbosity
         if self.__myargs.verbose:
-            print('{:^5s}{:<15d} (10) ---> {:<15s} (2)'.format(' ',self.__wholeNum,self.__wholeNumBin))
+            print('{:^5s}{:<20d} (10) ---> {:<15s} (2)'.format(' ',self.__wholeNum,self.__wholeNumBin))
     
     
     # convert dec num to bin
@@ -145,7 +145,7 @@ class IEEE754DFPU():
                 tempFloat -= 1
         # ---------- print verbosity
         if self.__myargs.verbose:
-            print('{:^5s}{:<15f} (10) ---> {:<15s} (2)'.format(' ',float(self.__decNum),self.__decNumBin))
+            print('{:^5s}{:<20f} (10) ---> {:<15s} (2)'.format(' ',float(self.__decNum),self.__decNumBin))
     
     
     # concatenate whole num and dec num
@@ -153,7 +153,7 @@ class IEEE754DFPU():
         self.__base2Num = '0b' + str(self.__wholeNumBin + '.' + self.__decNumBin).replace('0b','')
         # ---------- print verbosity
         if self.__myargs.verbose:
-            print('{:^5s}{:<15f} (10) ---> {:<15s} (2)'.format(' ',float(self.__inputNum),self.__base2Num))
+            print('{:^5s}{:<20f} (10) ---> {:<15s} (2)'.format(' ',float(self.__inputNum),self.__base2Num))
     
     
     # convert bin num to base 2 scientific notation
@@ -167,23 +167,23 @@ class IEEE754DFPU():
             self.__decPlaces = -1 * (tempDnum.index('1') + 1)
         # ---------- print verbosity
         if self.__myargs.verbose:
-            print('{:^5s}Decimal places: {:<5d}'.format(' ',int(self.__decPlaces)))
+            print('{:^5s}{:<21s}{:<5d}'.format(' ','Decimal places = ',int(self.__decPlaces)))
     
     
     # Determine sign of the number and display in binary format
     def getSign(self):
-        if self.__inputNum >= 0:    
+        if self.__myargs.signbit == 0:    
             self.__spSign = '0'
             self.__dpSign = '0'
             # print verbosity
             if self.__myargs.verbose:
-                print("     Sign bit:       1'b0")
+                print('{:^5s}{:<21s}{:<5s}'.format(' ','Sign bit = ',"1'b0"))
         else:
             self.__spSign = '1'
             self.__dpSign = '1'
             # print verbosity
             if self.__myargs.verbose:
-                print("     Sign bit:       1'b1")
+                print('{:^5s}{:<21s}{:<5s}'.format(' ','Sign bit = ',"1'b1"))
     
     
     # calculate the exponent bias and display in binary format
@@ -192,29 +192,47 @@ class IEEE754DFPU():
             self.__dpExponent += self.__decPlaces
             # print verbosity
             if self.__myargs.verbose:
-                print('{:^5s}Exponent bias:  {:<5d}'.format(' ',int(self.__dpExponent)))
-                print('{:^5s}{:<15d} (10) ---> {:<15s} (2)'.format(' ',int(self.__dpExponent),bin(self.__dpExponent)))
+                print('{:^5s}{:<21s}{:<5d}'.format(' ','Exponent bias = ',int(self.__dpExponent)))
+                print('{:^5s}{:<20d} (10) ---> {:<15s} (2)'.format(' ',int(self.__dpExponent),bin(self.__dpExponent)))
         elif self.__myargs.singleprecison == 1:
             self.__spExponent +=  self.__decPlaces
             # print verbosity
             if self.__myargs.verbose:
-                print('{:^5s}Exponent bias:  {:<5d}'.format(' ',int(self.__spExponent)))
-                print('{:^5s}{:<15d} (10) ---> {:<15s} (2)'.format(' ',int(self.__spExponent),bin(self.__spExponent)))
+                print('{:^5s}{:<21s}{:<5d}'.format(' ','Exponent bias = ',int(self.__spExponent)))
+                print('{:^5s}{:<20d} (10) ---> {:<15s} (2)'.format(' ',int(self.__spExponent),bin(self.__spExponent)))
     
     
     # caculate the mantissa and display in binary format
     def getMantissa(self):
-        w, tempMantissa = self.__base2Num.split('.')
+        tempMantissa = str
+        # ---------- check if num >= 1.0
+        if self.__wholeNum >= 1.0:
+            tempMantissa = list(self.__base2Num.replace('0b',''))
+            currIndex = tempMantissa.index('.')
+            tempMantissa.remove('.')
+            tempMantissa.insert(currIndex - self.__decPlaces,'.')
+            tempMantissa = ''.join(tempMantissa)
+        # ---------- check if num <= 1.0
+        else:
+            tempMantissa = list(self.__base2Num.replace('0b',''))
+            tempMantissa.remove('.')
+            tempMantissa.insert(abs(self.__decPlaces) + 1,'.')
+            tempMantissa = ''.join(tempMantissa)
+            padding, tempMantissa = re.split('[1][.]',tempMantissa)
+            tempMantissa = '1.' + tempMantissa
+            
         if self.__myargs.doubleprecison == 1:
             self.__dpMantissa = tempMantissa.ljust(52,'0')
             # print verbosity
             if self.__myargs.verbose:
-                print('{:^5s}Mantissa:       0b{:<52s} (2)'.format(' ',self.__dpMantissa))
+                # print('{:^5s}{:<21s}{:<5s}'.format(' ','Mantissa = ',tempMantissa))
+                print('{:^5s}{:<21s}{:<s} (2)'.format(' ','Mantissa = ',self.__dpMantissa))
         elif self.__myargs.singleprecison == 1:
             self.__spMantissa = tempMantissa.ljust(23,'0')
             # print verbosity
             if self.__myargs.verbose:
-                print('{:^5s}Mantissa:       0b{:<23s} (2)'.format(' ',self.__spMantissa))
+                # print('{:^5s}{:<21s}{:<5s}'.format(' ','Mantissa = ',tempMantissa))
+                print('{:^5s}{:<21s}{:<s} (2)'.format(' ','Mantissa = ',self.__spMantissa))
     
     
     # combine all parts
@@ -253,9 +271,9 @@ class IEEE754DFPU():
         self.decNum2Bin()
         self.joinBinNum()
         self.base2Scientific()
-        #self.getSign()
-        #self.getexpoBias()
-        #self.getMantissa()
+        self.getSign()
+        self.getexpoBias()
+        self.getMantissa()
         #self.combineAll()
 
 
