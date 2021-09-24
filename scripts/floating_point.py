@@ -32,8 +32,8 @@ class IEEE754DFPU():
     __dpSign = str
     __spExponent = int
     __dpExponent = int
-    __spExponentBin = str
-    __dpExponentBin = str
+    #__spExponentBin = str
+    #__dpExponentBin = str
     __spMantissa = str
     __dpMantissa = str
     spBinNum = str
@@ -131,7 +131,7 @@ class IEEE754DFPU():
     # convert dec num to bin
     def decNum2Bin(self):
         # ---------- change dec width to 32 bits
-        tempFloat = self.__decNum * 1
+        tempFloat = self.__decNum
         # ---------- multiply by 2 and store MSB in str
         for i in range(len(str(tempFloat))):
             tempFloat *= 2
@@ -275,12 +275,16 @@ class IEEE754DFPU():
         self.splitInputNum(number)
         self.wholeNum2Bin()
         self.decNum2Bin()
-        self.joinBinNum()
-        self.base2Scientific()
-        self.getSign()
-        self.getexpoBias()
-        self.getMantissa()
-        self.combineAll()
+        #self.joinBinNum()
+        #self.base2Scientific()
+        #self.getSign()
+        #self.getexpoBias()
+        #self.getMantissa()
+        #self.combineAll()
+        #if self.__myargs.doubleprecison == 1:
+        #    return self.dpHexNum
+        #elif self.__myargs.singleprecison == 1:
+        #    return self.spHexNum
 
 
 # =============================================================================
@@ -295,17 +299,10 @@ def main():
     # set precision level
     obj1.getPrecison()
     # convert decimal number to IEEE foat point conversion
-    obj1.dec2IeeeFloatPoint(number=math.sin(math.radians(1)))
+    num = obj1.dec2IeeeFloatPoint(number=math.sin(math.radians(1)))
+    print(math.sin(math.radians(1)),num)
     #obj1.dec2IeeeFloatPoint(number=85.125)
+
 
 if __name__ == '__main__':
     main()
-
-
-
-# print('len is ',len(str('1.0001110111110000101100101011100010011101110100011110')))
-# 0.01745240643728351
-
-# 1.0001110111110000101100101011100010011101110100011110
-# 0.017452406437283511653202339175550150685012340545654296875
-# 0.01745240643728351
