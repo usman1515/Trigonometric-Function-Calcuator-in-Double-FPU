@@ -225,18 +225,22 @@ class IEEE754DFPU():
             tempMantissa.insert(abs(self.__decPlaces) + 1,'.')
             tempMantissa = ''.join(tempMantissa)
             padding, tempMantissa = re.split('[1][.]',tempMantissa)
-            # tempMantissa = '1.' + tempMantissa
-        # ---------- append X zeros
+        # ---------- append or delete X zeros
         if self.__myargs.doubleprecison == 1:
-            self.__dpMantissa = tempMantissa.ljust(51,'0')
-            print('len dp man: ',len(self.__dpMantissa))
-            # print verbosity
+            if len(tempMantissa) > 52:
+                self.__dpMantissa = tempMantissa[:(-1 * (len(tempMantissa) - 52))]
+            else:
+                self.__dpMantissa = tempMantissa.ljust(51,'0')
+            # ---------- print verbosity
             if self.__myargs.verbose:
                 print('{:^5s}{:<21s}{:<s} (2)'.format(' ','Mantissa = ',str('1.' + tempMantissa)))
                 # print('{:^5s}{:<21s}{:<s} (2)'.format(' ','Mantissa = ',self.__dpMantissa))
         elif self.__myargs.singleprecison == 1:
-            self.__spMantissa = tempMantissa.ljust(23,'0')
-            # print verbosity
+            if len(tempMantissa) > 23:
+                self.__spMantissa = tempMantissa[:(-1 * (len(tempMantissa) - 23))]
+            else:
+                self.__spMantissa = tempMantissa.ljust(23,'0')
+            # ---------- print verbosity
             if self.__myargs.verbose:
                 print('{:^5s}{:<21s}{:<s} (2)'.format(' ','Mantissa = ',str('1.' + tempMantissa)))
                 # print('{:^5s}{:<21s}{:<s} (2)'.format(' ','Mantissa = ',self.__spMantissa))
@@ -273,9 +277,9 @@ class IEEE754DFPU():
             self.spHexNum = hex(int(self.spBinNum,2))
             # ---------- print verbosity
             if self.__myargs.verbose:
-                print('Output Number = {:<s} (2)'.format(self.spBinNum))
+                print('Output Number = {:<s} (2)\n'.format(self.spBinNum))
             # print(len(self.dpBinNum),self.dpBinNum,self.dpHexNum)
-            print('Output Number:  {:<s} (16)'.format(self.spHexNum))
+            print('Output Number:  {:<s} (16) \n'.format(self.spHexNum))
     
     
     # convert decimal number to IEEE foat point conversion
@@ -307,8 +311,9 @@ def main():
     # set precision level
     obj1.getPrecison()
     # convert decimal number to IEEE foat point conversion
-    num = obj1.dec2IeeeFloatPoint(number=math.sin(math.radians(1)))
-    print('\n\n\n',math.sin(math.radians(1)),num)
+    number = math.sin(math.radians(5))
+    num = obj1.dec2IeeeFloatPoint(number)
+    print('\n\n\n',number,num)
     #obj1.dec2IeeeFloatPoint(number=85.125)
 
 
