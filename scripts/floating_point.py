@@ -228,7 +228,8 @@ class IEEE754DFPU():
             # tempMantissa = '1.' + tempMantissa
         # ---------- append X zeros
         if self.__myargs.doubleprecison == 1:
-            self.__dpMantissa = tempMantissa.ljust(52,'0')
+            self.__dpMantissa = tempMantissa.ljust(51,'0')
+            print('len dp man: ',len(self.__dpMantissa))
             # print verbosity
             if self.__myargs.verbose:
                 print('{:^5s}{:<21s}{:<s} (2)'.format(' ','Mantissa = ',str('1.' + tempMantissa)))
@@ -245,14 +246,14 @@ class IEEE754DFPU():
     def combineAll(self):
         # ---------- for double precision
         if self.__myargs.doubleprecison == 1:
-            self.__dpExponent = bin(self.__dpExponent).replace('0b','')
+            self.__dpExponentBin = self.__dpExponentBin.replace('0b','')
             # ---------- dont include sign bit in hex
             if self.__myargs.signbit == 0:
-                self.dpBinNum += self.__dpExponent + self.__dpMantissa
+                self.dpBinNum += self.__dpExponentBin + self.__dpMantissa
             # ---------- include sign bit in hex
             elif self.__myargs.signbit == 1:
-                self.dpBinNum += self.__dpSign + self.__dpExponent + self.__dpMantissa
-            #self.dpBinNum += self.__dpSign + self.__dpExponent + self.__dpMantissa
+                self.dpBinNum += self.__dpSign + self.__dpExponentBin + self.__dpMantissa
+            #self.dpBinNum += self.__dpSign + self.__dpExponentBin + self.__dpMantissa
             self.dpHexNum = hex(int(self.dpBinNum,2))
             # ---------- print verbosity
             if self.__myargs.verbose:
@@ -262,13 +263,13 @@ class IEEE754DFPU():
         
         # ---------- for single precision
         elif self.__myargs.singleprecison == 1:
-            self.__spExponent = bin(self.__spExponent).replace('0b','')
+            self.__spExponentBin = self.__spExponentBin.replace('0b','')
             # ---------- dont include sign bit in hex
             if self.__myargs.signbit == 0:
-                self.spBinNum += self.__spExponent + self.__spMantissa
+                self.spBinNum += self.__spExponentBin + self.__spMantissa
             # ---------- include sign bit in hex
             elif self.__myargs.signbit == 1:
-                self.spBinNum += self.__spSign + self.__spExponent + self.__spMantissa
+                self.spBinNum += self.__spSign + self.__spExponentBin + self.__spMantissa
             self.spHexNum = hex(int(self.spBinNum,2))
             # ---------- print verbosity
             if self.__myargs.verbose:
@@ -315,9 +316,5 @@ if __name__ == '__main__':
     main()
 
 
-
-# 0 - 1111111001 - 00011101111100001011001010111000100111011101000111011
-# 0 - 1111111001 - 00011101111100001011001010111000100111011101000111011
-
-# 0 - 1111111001 - 0001110111110000101100101011100010011101110100011110
-# 0 - 1111111001 - 00011101111100001011001010111000100111011101000111011
+# 1 - 01111111001 - 00011101111100001011001010111000100111011101000111011 # mine
+# 0 - 01111111001 - 0001110111110000101100101011100010011101110100011110 # orignal
