@@ -32,8 +32,8 @@ class IEEE754DFPU():
     __dpSign = str
     __spExponent = int
     __dpExponent = int
-    #__spExponentBin = str
-    #__dpExponentBin = str
+    __spExponentBin = str
+    __dpExponentBin = str
     __spMantissa = str
     __dpMantissa = str
     spBinNum = str
@@ -56,6 +56,8 @@ class IEEE754DFPU():
         self.__dpSign = ''
         self.__spExponent = 127
         self.__dpExponent = 1023
+        self.__spExponentBin = ''
+        self.__dpExponentBin = ''
         self.__spMantissa = ''
         self.__dpMantissa = ''
         self.spBinNum = '0b'
@@ -190,16 +192,20 @@ class IEEE754DFPU():
     def getexpoBias(self):
         if self.__myargs.doubleprecison == 1:
             self.__dpExponent += self.__decPlaces
+            self.__dpExponentBin = bin(self.__dpExponent).replace('0b','').rjust(11,'0')
+            self.__dpExponentBin = '0b' + self.__dpExponentBin            
             # print verbosity
             if self.__myargs.verbose:
                 print('{:^5s}{:<21s}{:<5d}'.format(' ','Exponent bias = ',int(self.__dpExponent)))
-                print('{:^5s}{:<20d} (10) ---> {:<15s} (2)'.format(' ',int(self.__dpExponent),bin(self.__dpExponent)))
+                print('{:^5s}{:<20d} (10) ---> {:<15s} (2)'.format(' ',int(self.__dpExponent),self.__dpExponentBin))
         elif self.__myargs.singleprecison == 1:
-            self.__spExponent +=  self.__decPlaces
+            self.__spExponent += self.__decPlaces
+            self.__spExponentBin = bin(self.__spExponent).replace('0b','').rjust(8,'0')
+            self.__spExponentBin = '0b' + self.__spExponentBin
             # print verbosity
             if self.__myargs.verbose:
                 print('{:^5s}{:<21s}{:<5d}'.format(' ','Exponent bias = ',int(self.__spExponent)))
-                print('{:^5s}{:<20d} (10) ---> {:<15s} (2)'.format(' ',int(self.__spExponent),bin(self.__spExponent)))
+                print('{:^5s}{:<20d} (10) ---> {:<15s} (2)'.format(' ',int(self.__spExponent),self.__spExponentBin))
     
     
     # caculate the mantissa and display in binary format
@@ -246,6 +252,7 @@ class IEEE754DFPU():
             # ---------- include sign bit in hex
             elif self.__myargs.signbit == 1:
                 self.dpBinNum += self.__dpSign + self.__dpExponent + self.__dpMantissa
+            #self.dpBinNum += self.__dpSign + self.__dpExponent + self.__dpMantissa
             self.dpHexNum = hex(int(self.dpBinNum,2))
             # ---------- print verbosity
             if self.__myargs.verbose:
@@ -275,16 +282,16 @@ class IEEE754DFPU():
         self.splitInputNum(number)
         self.wholeNum2Bin()
         self.decNum2Bin()
-        #self.joinBinNum()
-        #self.base2Scientific()
-        #self.getSign()
-        #self.getexpoBias()
-        #self.getMantissa()
-        #self.combineAll()
-        #if self.__myargs.doubleprecison == 1:
-        #    return self.dpHexNum
-        #elif self.__myargs.singleprecison == 1:
-        #    return self.spHexNum
+        self.joinBinNum()
+        self.base2Scientific()
+        self.getSign()
+        self.getexpoBias()
+        self.getMantissa()
+        self.combineAll()
+        if self.__myargs.doubleprecison == 1:
+            return self.dpHexNum
+        elif self.__myargs.singleprecison == 1:
+            return self.spHexNum
 
 
 # =============================================================================
@@ -300,9 +307,17 @@ def main():
     obj1.getPrecison()
     # convert decimal number to IEEE foat point conversion
     num = obj1.dec2IeeeFloatPoint(number=math.sin(math.radians(1)))
-    print(math.sin(math.radians(1)),num)
+    print('\n\n\n',math.sin(math.radians(1)),num)
     #obj1.dec2IeeeFloatPoint(number=85.125)
 
 
 if __name__ == '__main__':
     main()
+
+
+
+# 0 - 1111111001 - 00011101111100001011001010111000100111011101000111011
+# 0 - 1111111001 - 00011101111100001011001010111000100111011101000111011
+
+# 0 - 1111111001 - 0001110111110000101100101011100010011101110100011110
+# 0 - 1111111001 - 00011101111100001011001010111000100111011101000111011
