@@ -109,7 +109,7 @@ class IEEE754DFPU():
             self.__inputNum = Decimal(self.__myargs.inputvalue)
         else:
             self.__inputNum = Decimal(number)
-        print('Input dec num: ',self.__inputNum)
+        print('Input Number:   {:<20f} (10)'.format(self.__inputNum))
         # ---------- split input num
         self.__decNum, self.__wholeNum = math.modf(self.__inputNum)
         self.__wholeNum = int(self.__wholeNum)
@@ -219,49 +219,55 @@ class IEEE754DFPU():
             tempMantissa.insert(abs(self.__decPlaces) + 1,'.')
             tempMantissa = ''.join(tempMantissa)
             padding, tempMantissa = re.split('[1][.]',tempMantissa)
-            tempMantissa = '1.' + tempMantissa
-            
+            # tempMantissa = '1.' + tempMantissa
+        # ---------- append X zeros
         if self.__myargs.doubleprecison == 1:
             self.__dpMantissa = tempMantissa.ljust(52,'0')
             # print verbosity
             if self.__myargs.verbose:
-                # print('{:^5s}{:<21s}{:<5s}'.format(' ','Mantissa = ',tempMantissa))
-                print('{:^5s}{:<21s}{:<s} (2)'.format(' ','Mantissa = ',self.__dpMantissa))
+                print('{:^5s}{:<21s}{:<s} (2)'.format(' ','Mantissa = ',str('1.' + tempMantissa)))
+                # print('{:^5s}{:<21s}{:<s} (2)'.format(' ','Mantissa = ',self.__dpMantissa))
         elif self.__myargs.singleprecison == 1:
             self.__spMantissa = tempMantissa.ljust(23,'0')
             # print verbosity
             if self.__myargs.verbose:
-                # print('{:^5s}{:<21s}{:<5s}'.format(' ','Mantissa = ',tempMantissa))
-                print('{:^5s}{:<21s}{:<s} (2)'.format(' ','Mantissa = ',self.__spMantissa))
+                print('{:^5s}{:<21s}{:<s} (2)'.format(' ','Mantissa = ',str('1.' + tempMantissa)))
+                # print('{:^5s}{:<21s}{:<s} (2)'.format(' ','Mantissa = ',self.__spMantissa))
     
     
     # combine all parts
     def combineAll(self):
-        # for double precision
+        # ---------- for double precision
         if self.__myargs.doubleprecison == 1:
             self.__dpExponent = bin(self.__dpExponent).replace('0b','')
-            # dont include sign bit in hex
+            # ---------- dont include sign bit in hex
             if self.__myargs.signbit == 0:
                 self.dpBinNum += self.__dpExponent + self.__dpMantissa
-            # include sign bit in hex
+            # ---------- include sign bit in hex
             elif self.__myargs.signbit == 1:
                 self.dpBinNum += self.__dpSign + self.__dpExponent + self.__dpMantissa
             self.dpHexNum = hex(int(self.dpBinNum,2))
+            # ---------- print verbosity
+            if self.__myargs.verbose:
+                print('Output Number = {:<s} (2)'.format(self.dpBinNum))
             # print(len(self.dpBinNum),self.dpBinNum,self.dpHexNum)
-            print('Output Number: {:<17s} (16) ---> {:<66s} (2)'.format(self.dpHexNum,self.dpBinNum))
+            print('Output Number:  {:<s} (16)'.format(self.dpHexNum))
         
-        # for single precision
+        # ---------- for single precision
         elif self.__myargs.singleprecison == 1:
             self.__spExponent = bin(self.__spExponent).replace('0b','')
-            # dont include sign bit in hex
+            # ---------- dont include sign bit in hex
             if self.__myargs.signbit == 0:
                 self.spBinNum += self.__spExponent + self.__spMantissa
-            # include sign bit in hex
+            # ---------- include sign bit in hex
             elif self.__myargs.signbit == 1:
                 self.spBinNum += self.__spSign + self.__spExponent + self.__spMantissa
             self.spHexNum = hex(int(self.spBinNum,2))
-            # print(len(self.spBinNum),self.spBinNum,self.spHexNum)
-            print('Output Number: {:<18s} (16) ---> {:<34s} (2)'.format(self.spHexNum,self.spBinNum))
+            # ---------- print verbosity
+            if self.__myargs.verbose:
+                print('Output Number = {:<s} (2)'.format(self.spBinNum))
+            # print(len(self.dpBinNum),self.dpBinNum,self.dpHexNum)
+            print('Output Number:  {:<s} (16)'.format(self.spHexNum))
     
     
     # convert decimal number to IEEE foat point conversion
@@ -274,7 +280,7 @@ class IEEE754DFPU():
         self.getSign()
         self.getexpoBias()
         self.getMantissa()
-        #self.combineAll()
+        self.combineAll()
 
 
 # =============================================================================
