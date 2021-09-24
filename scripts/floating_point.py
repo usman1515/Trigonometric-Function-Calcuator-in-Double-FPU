@@ -174,7 +174,7 @@ class IEEE754DFPU():
     
     # Determine sign of the number and display in binary format
     def getSign(self):
-        if self.__myargs.signbit == 0:    
+        if self.__inputNum >= 0:    
             self.__spSign = '0'
             self.__dpSign = '0'
             # print verbosity
