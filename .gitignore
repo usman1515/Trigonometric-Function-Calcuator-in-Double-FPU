@@ -1,5 +1,5 @@
-Trigonometric_Function_Calcuator_in_Double_FPU.mpf
-Trigonometric_Function_Calcuator_in_Double_FPU.cr.mti
+*.cr.mti
+*.mpf
 transcript
 work/
 bin/
@@ -7,3 +7,4 @@ test/*.bak
 src/*.bak
 vsim.wlf
 vish_stacktrace.vstf
+scripts/__pycache__
