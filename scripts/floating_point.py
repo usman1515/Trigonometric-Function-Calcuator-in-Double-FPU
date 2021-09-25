@@ -138,22 +138,25 @@ class IEEE754DFPU():
     
     # convert dec num to bin
     def decNum2Bin(self):
-        # ---------- change dec width to 32 bits
+        # ---------- move to temp var
         tempFloat = self.__decNum
         # ---------- multiply by 2 and store MSB in str
         for i in range(len(str(tempFloat))):
             tempFloat *= 2
-            bit, dump = str(tempFloat).split('.')
+            tempOut = str(tempFloat).split('.')
             # ---------- print debugging
             if self.__myargs.debug:
-                print('{:<5s}---- Bit[{:>2d}]= {:^5s} --> Temp float  =  {:f}'.format(' ',i,bit,tempFloat))
-            self.__decNumBin += bit
+                print('{:<5s}---- Bit[{:>2d}]= {:^5s} --> Temp float  =  {:f}'.format(' ',i,tempOut[0],tempFloat))
+            self.__decNumBin += tempOut[0]
             # ---------- if tempFloat >= 1 change back to 0
             if tempFloat >= 1.0:
                 tempFloat -= 1
         # ---------- print verbosity
         if self.__myargs.verbose:
             print('{:^5s}{:<20f} (10) ---> {:<15s} (2)'.format(' ',float(self.__decNum),self.__decNumBin))
+        # ---------- clear all local var
+        tempFloat = 0
+        tempOut.clear()
     
     
     # concatenate whole num and dec num
@@ -166,16 +169,18 @@ class IEEE754DFPU():
     
     # convert bin num to base 2 scientific notation
     def base2Scientific(self):
-        tempWnum, tempDnum = self.__base2Num.replace('0b','').split('.')
+        tempNum = self.__base2Num.replace('0b','').split('.')
         # ---------- check if num >= 1.0
         if self.__wholeNum >= 1.0:
-            self.__decPlaces = len(tempWnum) - tempWnum.index('1') - 1
+            self.__decPlaces = len(tempNum[0]) - tempNum[0].index('1') - 1
         # ---------- check if num <= 1.0
         else:
-            self.__decPlaces = -1 * (tempDnum.index('1') + 1)
+            self.__decPlaces = -1 * (tempNum[1].index('1') + 1)
         # ---------- print verbosity
         if self.__myargs.verbose:
             print('{:^5s}{:<21s}{:<5d}'.format(' ','Decimal places = ',int(self.__decPlaces)))
+        # ---------- clear all local var
+        tempNum.clear()
     
     
     # Determine sign of the number and display in binary format
@@ -250,6 +255,8 @@ class IEEE754DFPU():
             if self.__myargs.verbose:
                 print('{:^5s}{:<21s}{:<s} (2)'.format(' ','Mantissa = ',str('1.' + tempMantissa)))
                 # print('{:^5s}{:<21s}{:<s} (2)'.format(' ','Mantissa = ',self.__spMantissa))
+        # ---------- clear all local var
+        tempMantissa = ''
     
     
     # combine all parts
@@ -263,7 +270,6 @@ class IEEE754DFPU():
             # ---------- include sign bit in hex
             elif self.__myargs.signbit == 1:
                 self.dpBinNum += self.__dpSign + self.__dpExponentBin + self.__dpMantissa
-            #self.dpBinNum += self.__dpSign + self.__dpExponentBin + self.__dpMantissa
             self.dpHexNum = hex(int(self.dpBinNum,2))
             # ---------- print verbosity
             if self.__myargs.verbose:
