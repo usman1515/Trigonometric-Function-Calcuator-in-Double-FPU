@@ -5,9 +5,16 @@ https://www.wikihow.com/Convert-a-Number-from-Decimal-to-IEEE-754-Floating-Point
 https://babbage.cs.qc.cuny.edu/IEEE-754.old/Decimal.html
 '''
 
+# ! ========================================
+# ! single precision is still WORK IN PROGRESS
+# ! double precision works FINE
+# TODO: fix single precision
+# ! ========================================
+
+from decimal import *
 import argparse
-import logging
 import math
+import re
 import os
 os.system('clear')
 
@@ -20,7 +27,9 @@ class IEEE754DFPU():
     
     # ----------------------------------------------------------------------------- Variables
     __myargs = argparse.Namespace
-    __inputNum = float
+    __inputNum = Decimal
+    __wholeNum = int
+    __decNum = Decimal
     __wholeNumBin = str
     __decNumBin = str
     __base2Num = str
@@ -29,6 +38,8 @@ class IEEE754DFPU():
     __dpSign = str
     __spExponent = int
     __dpExponent = int
+    __spExponentBin = str
+    __dpExponentBin = str
     __spMantissa = str
     __dpMantissa = str
     spBinNum = str
@@ -41,6 +52,8 @@ class IEEE754DFPU():
     def __init__(self):
         self.__myargs = argparse.Namespace
         self.__inputNum = 0.0
+        self.__wholeNum = 0
+        self.__decNum = 0.0
         self.__wholeNumBin = ''
         self.__decNumBin = '0b'
         self.__base2Num = ''
@@ -49,6 +62,8 @@ class IEEE754DFPU():
         self.__dpSign = ''
         self.__spExponent = 127
         self.__dpExponent = 1023
+        self.__spExponentBin = ''
+        self.__dpExponentBin = ''
         self.__spMantissa = ''
         self.__dpMantissa = ''
         self.spBinNum = '0b'
@@ -59,12 +74,12 @@ class IEEE754DFPU():
     
     # setup arguments for class
     def setArguments(self):
-        # set arguments for class IEEE754DFPU
+        # ---------- set arguments for class IEEE754DFPU
         parser = argparse.ArgumentParser(prog='IEEE-754 Double Floating Point Unit',
                                         usage='%(prog)s [options] path',
                                         description='IEEE-754 single and double precision hexadecimal floating point unit generator',
                                         epilog='Happy trigonometry :)')
-        # list of all possible args for IEEE754DFPU
+        # ---------- list of all possible args for IEEE754DFPU
         parser.add_argument('-dp','--doubleprecison',
                             type=int,default=1,metavar='',required=False,nargs='?',help='Set output value to have double precision')
         parser.add_argument('-sp','--singleprecison',
@@ -75,10 +90,12 @@ class IEEE754DFPU():
                             type=int,default=0,metavar='',required=False,help='Include sign bit in hex num')
         parser.add_argument('-v','--verbose',
                             type=int,default=0,metavar='',required=False,nargs='?',help='print verbose')
+        parser.add_argument('-d','--debug',
+                            type=int,default=0,metavar='',required=False,nargs='?',help='print debugging')
         self.__myargs = parser.parse_args()
     
     
-    # set precison level i.e single or double
+    # set precision level i.e single or double
     def getPrecison(self):
         if self.__myargs.singleprecison == 1:
             self.__myargs.doubleprecison = 0
@@ -89,50 +106,81 @@ class IEEE754DFPU():
             self.__myargs.singleprecison = 0
         # print verbosity
         if self.__myargs.verbose:
-            print('Single Precison: ',self.__myargs.singleprecison)
-            print('Double Precison: ',self.__myargs.doubleprecison)
+            print('{:<5s}{:<21s}{:<d}'.format(' ','Single Precision: ',self.__myargs.singleprecison))
+            print('{:<5s}{:<21s}{:<d}'.format(' ','Double Precision: ',self.__myargs.doubleprecison))
     
     
-    # convert whole number to binary
-    def convertInputNum2Bin(self,number):
-        # get num as arg or input
+    # split input number into whole and dec
+    def splitInputNum(self,number):
+        # ---------- get num as arg or input
         if self.__myargs.inputvalue:
-            self.__inputNum = self.__myargs.inputvalue
+            self.__inputNum = Decimal(self.__myargs.inputvalue)
         else:
-            self.__inputNum = number
-        # split input num
-        decNum, wholeNum = math.modf(self.__inputNum)
-        # convert whole num to binary
-        self.__wholeNumBin = bin(int(wholeNum))
-        # convert dec num to binary
-        tempdecNum = decNum
-        while not tempdecNum >= 1:
-            tempdecNum *= 2
-            # print('Each dec num stage: ',tempdecNum,int(tempdecNum))
-            self.__decNumBin += str(int(tempdecNum))
-        print('Input Number:  {:<18f} (10)'.format(self.__inputNum))
-        # print verbosity
+            self.__inputNum = Decimal(number)
+        print('Input Number:   {:<20f} (10)'.format(self.__inputNum))
+        # ---------- split input num
+        self.__decNum, self.__wholeNum = math.modf(self.__inputNum)
+        self.__wholeNum = int(self.__wholeNum)
+        self.__decNum = Decimal(self.__decNum)
+        # ---------- print debugging
+        if self.__myargs.debug:
+            print('{:<5s}---- Length -> Whole num = [{:d}] Decimal num = [{:d}]'
+                .format(' ',len(str(self.__wholeNum)),len(str(self.__decNum))))
+    
+    
+    # convert whole num to bin
+    def wholeNum2Bin(self):
+        self.__wholeNumBin = bin(self.__wholeNum)
+        # ---------- print verbosity
         if self.__myargs.verbose:
-            print('{:^5s}{:<15d} (10) ---> {:<15s} (2)'.format(' ',int(wholeNum),self.__wholeNumBin))
-            print('{:^5s}{:<15f} (10) ---> {:<15s} (2)'.format(' ',decNum,self.__decNumBin))
+            print('{:^5s}{:<20d} (10) ---> {:<15s} (2)'.format(' ',self.__wholeNum,self.__wholeNumBin))
+    
+    
+    # convert dec num to bin
+    def decNum2Bin(self):
+        # ---------- move to temp var
+        tempFloat = self.__decNum
+        # ---------- multiply by 2 and store MSB in str
+        for i in range(len(str(tempFloat))):
+            tempFloat *= 2
+            tempOut = str(tempFloat).split('.')
+            # ---------- print debugging
+            if self.__myargs.debug:
+                print('{:<5s}---- Bit[{:>2d}]= {:^5s} --> Temp float  =  {:f}'.format(' ',i,tempOut[0],tempFloat))
+            self.__decNumBin += tempOut[0]
+            # ---------- if tempFloat >= 1 change back to 0
+            if tempFloat >= 1.0:
+                tempFloat -= 1
+        # ---------- print verbosity
+        if self.__myargs.verbose:
+            print('{:^5s}{:<20f} (10) ---> {:<15s} (2)'.format(' ',float(self.__decNum),self.__decNumBin))
+        # ---------- clear all local var
+        tempFloat = 0
+        tempOut.clear()
+    
+    
+    # concatenate whole num and dec num
+    def joinBinNum(self):
+        self.__base2Num = '0b' + str(self.__wholeNumBin + '.' + self.__decNumBin).replace('0b','')
+        # ---------- print verbosity
+        if self.__myargs.verbose:
+            print('{:^5s}{:<20f} (10) ---> {:<15s} (2)'.format(' ',float(self.__inputNum),self.__base2Num))
     
     
     # convert bin num to base 2 scientific notation
     def base2Scientific(self):
-        # concatenate whole num and dec num
-        self.__base2Num = str(self.__wholeNumBin + '.' + self.__decNumBin).replace('0b','')
-        # convert to base 2
-        self.__decPlaces = self.__base2Num.index('.') - 1
-        tempList = list(self.__base2Num)
-        tempList.remove('.')
-        tempList.insert(1,'.')
-        self.__base2Num = ''
-        self.__base2Num = self.__base2Num.join(tempList)
-        tempList.clear()
-        # print verbosity
+        tempNum = self.__base2Num.replace('0b','').split('.')
+        # ---------- check if num >= 1.0
+        if self.__wholeNum >= 1.0:
+            self.__decPlaces = len(tempNum[0]) - tempNum[0].index('1') - 1
+        # ---------- check if num <= 1.0
+        else:
+            self.__decPlaces = -1 * (tempNum[1].index('1') + 1)
+        # ---------- print verbosity
         if self.__myargs.verbose:
-            print('{:^5s}{:<15f} (10) ---> {:<15s} (2)'.format(' ',self.__inputNum,self.__base2Num))
-            print('{:^5s}Decimal places: {:<5d}'.format(' ',int(self.__decPlaces)))
+            print('{:^5s}{:<21s}{:<5d}'.format(' ','Decimal places = ',int(self.__decPlaces)))
+        # ---------- clear all local var
+        tempNum.clear()
     
     
     # Determine sign of the number and display in binary format
@@ -142,99 +190,127 @@ class IEEE754DFPU():
             self.__dpSign = '0'
             # print verbosity
             if self.__myargs.verbose:
-                print("     Sign bit:       1'b0")
+                print('{:^5s}{:<21s}{:<5s}'.format(' ','Sign bit = ',"1'b0"))
         else:
             self.__spSign = '1'
             self.__dpSign = '1'
             # print verbosity
             if self.__myargs.verbose:
-                print("     Sign bit:       1'b1")
+                print('{:^5s}{:<21s}{:<5s}'.format(' ','Sign bit = ',"1'b1"))
     
     
     # calculate the exponent bias and display in binary format
     def getexpoBias(self):
         if self.__myargs.doubleprecison == 1:
             self.__dpExponent += self.__decPlaces
+            self.__dpExponentBin = bin(self.__dpExponent).replace('0b','').rjust(11,'0')
+            self.__dpExponentBin = '0b' + self.__dpExponentBin            
             # print verbosity
             if self.__myargs.verbose:
-                print('{:^5s}Exponent bias:  {:<5d}'.format(' ',int(self.__dpExponent)))
-                print('{:^5s}{:<15d} (10) ---> {:<15s} (2)'.format(' ',int(self.__dpExponent),bin(self.__dpExponent)))
+                print('{:^5s}{:<21s}{:<5d}'.format(' ','Exponent bias = ',int(self.__dpExponent)))
+                print('{:^5s}{:<20d} (10) ---> {:<15s} (2)'.format(' ',int(self.__dpExponent),self.__dpExponentBin))
         elif self.__myargs.singleprecison == 1:
-            self.__spExponent +=  self.__decPlaces
+            self.__spExponent += self.__decPlaces
+            self.__spExponentBin = bin(self.__spExponent).replace('0b','').rjust(8,'0')
+            self.__spExponentBin = '0b' + self.__spExponentBin
             # print verbosity
             if self.__myargs.verbose:
-                print('{:^5s}Exponent bias:  {:<5d}'.format(' ',int(self.__spExponent)))
-                print('{:^5s}{:<15d} (10) ---> {:<15s} (2)'.format(' ',int(self.__spExponent),bin(self.__spExponent)))
+                print('{:^5s}{:<21s}{:<5d}'.format(' ','Exponent bias = ',int(self.__spExponent)))
+                print('{:^5s}{:<20d} (10) ---> {:<15s} (2)'.format(' ',int(self.__spExponent),self.__spExponentBin))
     
     
     # caculate the mantissa and display in binary format
     def getMantissa(self):
-        w, tempMantissa = self.__base2Num.split('.')
+        tempMantissa = str
+        # ---------- check if num >= 1.0
+        if self.__wholeNum >= 1.0:
+            tempMantissa = list(self.__base2Num.replace('0b',''))
+            currIndex = tempMantissa.index('.')
+            tempMantissa.remove('.')
+            tempMantissa.insert(currIndex - self.__decPlaces,'.')
+            tempMantissa = ''.join(tempMantissa)
+        # ---------- check if num <= 1.0
+        else:
+            tempMantissa = list(self.__base2Num.replace('0b',''))
+            tempMantissa.remove('.')
+            tempMantissa.insert(abs(self.__decPlaces) + 1,'.')
+            tempMantissa = ''.join(tempMantissa)
+            padding, tempMantissa = re.split('[1][.]',tempMantissa)
+        # ---------- append or delete X zeros
         if self.__myargs.doubleprecison == 1:
-            self.__dpMantissa = tempMantissa.ljust(52,'0')
-            # print verbosity
+            if len(tempMantissa) > 52:
+                self.__dpMantissa = tempMantissa[:(-1 * (len(tempMantissa) - 52))]
+            else:
+                self.__dpMantissa = tempMantissa.ljust(51,'0')
+            # ---------- print verbosity
             if self.__myargs.verbose:
-                print('{:^5s}Mantissa:       0b{:<52s} (2)'.format(' ',self.__dpMantissa))
+                print('{:^5s}{:<21s}{:<s} (2)'.format(' ','Mantissa = ',str('1.' + tempMantissa)))
+                # print('{:^5s}{:<21s}{:<s} (2)'.format(' ','Mantissa = ',self.__dpMantissa))
         elif self.__myargs.singleprecison == 1:
-            self.__spMantissa = tempMantissa.ljust(23,'0')
-            # print verbosity
+            if len(tempMantissa) > 23:
+                self.__spMantissa = tempMantissa[:(-1 * (len(tempMantissa) - 23))]
+            else:
+                self.__spMantissa = tempMantissa.ljust(23,'0')
+            # ---------- print verbosity
             if self.__myargs.verbose:
-                print('{:^5s}Mantissa:       0b{:<23s} (2)'.format(' ',self.__spMantissa))
+                print('{:^5s}{:<21s}{:<s} (2)'.format(' ','Mantissa = ',str('1.' + tempMantissa)))
+                # print('{:^5s}{:<21s}{:<s} (2)'.format(' ','Mantissa = ',self.__spMantissa))
+        # ---------- clear all local var
+        tempMantissa = ''
     
     
     # combine all parts
     def combineAll(self):
-        # for double precision
+        # ---------- for double precision
         if self.__myargs.doubleprecison == 1:
-            self.__dpExponent = bin(self.__dpExponent).replace('0b','')
-            # dont include sign bit in hex
+            self.__dpExponentBin = self.__dpExponentBin.replace('0b','')
+            # ---------- dont include sign bit in hex
             if self.__myargs.signbit == 0:
-                self.dpBinNum += self.__dpExponent + self.__dpMantissa
-            # include sign bit in hex
+                self.dpBinNum += self.__dpExponentBin + self.__dpMantissa
+            # ---------- include sign bit in hex
             elif self.__myargs.signbit == 1:
-                self.dpBinNum += self.__dpSign + self.__dpExponent + self.__dpMantissa
+                self.dpBinNum += self.__dpSign + self.__dpExponentBin + self.__dpMantissa
             self.dpHexNum = hex(int(self.dpBinNum,2))
+            # ---------- print verbosity
+            if self.__myargs.verbose:
+                print('{:^5s}{:<21s}{:<s} (2)'.format(' ','Output Number = ',self.dpBinNum))
             # print(len(self.dpBinNum),self.dpBinNum,self.dpHexNum)
-            print('Output Number: {:<17s} (16) ---> {:<66s} (2)'.format(self.dpHexNum,self.dpBinNum))
+            print('Output Number:  {:<s} (16)'.format(self.dpHexNum))
         
-        # for single precision
+        # ---------- for single precision
         elif self.__myargs.singleprecison == 1:
-            self.__spExponent = bin(self.__spExponent).replace('0b','')
-            # dont include sign bit in hex
+            self.__spExponentBin = self.__spExponentBin.replace('0b','')
+            # ---------- dont include sign bit in hex
             if self.__myargs.signbit == 0:
-                self.spBinNum += self.__spExponent + self.__spMantissa
-            # include sign bit in hex
+                self.spBinNum += self.__spExponentBin + self.__spMantissa
+            # ---------- include sign bit in hex
             elif self.__myargs.signbit == 1:
-                self.spBinNum += self.__spSign + self.__spExponent + self.__spMantissa
+                self.spBinNum += self.__spSign + self.__spExponentBin + self.__spMantissa
             self.spHexNum = hex(int(self.spBinNum,2))
-            # print(len(self.spBinNum),self.spBinNum,self.spHexNum)
-            print('Output Number: {:<18s} (16) ---> {:<34s} (2)'.format(self.spHexNum,self.spBinNum))
+            # ---------- print verbosity
+            if self.__myargs.verbose:
+                print('{:^5s}{:<21s}{:<s} (2)\n'.format(' ','Output Number = ',self.spBinNum))
+            # print(len(self.dpBinNum),self.dpBinNum,self.dpHexNum)
+            print('Output Number:  {:<s} (16) \n'.format(self.spHexNum))
     
     
     # convert decimal number to IEEE foat point conversion
     def dec2IeeeFloatPoint(self,number):
-        self.convertInputNum2Bin(number)
+        self.splitInputNum(number)
+        self.wholeNum2Bin()
+        self.decNum2Bin()
+        self.joinBinNum()
         self.base2Scientific()
         self.getSign()
         self.getexpoBias()
         self.getMantissa()
         self.combineAll()
+        if self.__myargs.doubleprecison == 1:
+            return self.dpHexNum
+        elif self.__myargs.singleprecison == 1:
+            return self.spHexNum
 
 
 # =============================================================================
 # ================================= End Class =================================
 # =============================================================================
-
-def main():
-    # create class object
-    obj1 = IEEE754DFPU()
-    # setup arguments for class 
-    obj1.setArguments()
-    # set precison level
-    obj1.getPrecison()
-    # convert decimal number to IEEE foat point conversion
-    obj1.dec2IeeeFloatPoint(number=85.125)
-
-
-if __name__ == '__main__':
-    main()
