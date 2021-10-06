@@ -9,7 +9,7 @@ https://class.ece.iastate.edu/arun/CprE281_F05/ieee754/ie5.html
 
 from mpmath import mp
 import argparse
-#import math
+import math
 import re
 import os
 os.system('clear')
@@ -24,14 +24,20 @@ class DoublePrecision():
     __inputNum = float
     __spSign = str
     __dpSign = str
+    __wholeNum = int
+    __decNum = float
+    __binaryPrecision = int
     
     # ------------------------------------------- Functions
     # constructor
     def __init__(self):
         self.__myargs = argparse.Namespace
+        self.__binaryPrecision = 64
         self.__inputNum = 0.0
         self.__spSign = ''
         self.__dpSign = ''
+        self.__wholeNum = 0
+        self.__decNum = 0.0
     
     
     # setup arguments for class
@@ -53,20 +59,46 @@ class DoublePrecision():
         self.__myargs = parser.parse_args()
     
     
-    # Determine sign of the number and display in binary format
+    # determine sign of the number and display in binary format
     def getSign(self):
         if self.__inputNum >= 0:    
             self.__spSign = '0'
             self.__dpSign = '0'
-            ## print verbosity
-            #if self.__myargs.verbose:
-            #    print('{:^5s}{:<21s}{:<5s}'.format(' ','Sign bit = ',"1'b0"))
+            # print verbosity
+            if self.__myargs.verbose:
+                print('{:^5s}---- {:<21s}{:<5s}'.format(' ','Sign bit = ',"1'b0"))
         else:
             self.__spSign = '1'
             self.__dpSign = '1'
-            ## print verbosity
-            #if self.__myargs.verbose:
-            #    print('{:^5s}{:<21s}{:<5s}'.format(' ','Sign bit = ',"1'b1"))
+            # print verbosity
+            if self.__myargs.verbose:
+                print('{:^5s}---- {:<21s}{:<5s}'.format(' ','Sign bit = ',"1'b1"))
+    
+    
+    # split input number into whole and dec
+    def splitInputNum(self,number):
+        # ---------- set decimal places and precision
+        mp.prec = self.__binaryPrecision
+        # ---------- get num as arg or input
+        if self.__myargs.inputvalue:
+            self.__inputNum = mp.mpf(self.__myargs.inputvalue)
+        else:
+            self.__inputNum = mp.mpf(number)
+        print('Input Number:   {0} (10)'.format(self.__inputNum))
+        # ---------- split input num
+        if self.__inputNum >= 1.0:
+            self.__decNum, self.__wholeNum = math.modf(self.__inputNum)
+            self.__wholeNum = int(self.__wholeNum)
+            self.__decNum = mp.mpf(self.__decNum)
+        else:
+            self.__wholeNum = 0
+            self.__decNum = mp.mpf(self.__decNum)
+        # ---------- print debugging
+        if self.__myargs.verbose:
+            print('{:<5s}---- Whole num = [{:d}] Decimal num = [{:}]'
+                .format(' ',self.__wholeNum,self.__decNum))
+            print('{:<5s}---- Binary Precision = {:<2d} Decimal Places = {:<2d}'
+                .format(' ',mp.prec,mp.dps))
 
 
 # =============================================================================
@@ -74,7 +106,11 @@ class DoublePrecision():
 # =============================================================================
 
 def main():
+    
+    
     obj1 = DoublePrecision()
+    obj1.setArguments()
+    obj1.splitInputNum(number=math.pi)
     obj1.getSign()
     #for i in range(0,91,1):
     #    # val = Decimal(math.sin(math.radians(i)))
