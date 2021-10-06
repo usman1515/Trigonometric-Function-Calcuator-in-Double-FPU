@@ -24,9 +24,9 @@ class DoublePrecision():
     __inputNum = float
     __spSign = str
     __dpSign = str
+    __binaryPrecision = int
     __wholeNum = int
     __decNum = float
-    __binaryPrecision = int
     __wholeNumBin = str
     __decNumBin = str
     
@@ -105,6 +105,11 @@ class DoublePrecision():
                 .format(' ',mp.prec,mp.dps))
     
     
+    # convert bin num to base 2 scientific notation
+    def base2Scientific(self):
+        pass
+    
+    
     # convert the input num to binary
     def wholeNum2Bin(self):
         if self.__wholeNum > 0:
@@ -114,7 +119,15 @@ class DoublePrecision():
         # ---------- print verbosity
         if self.__myargs.verbose:
             print('{:^5s}---- {:<10d} (10) ---> {:<10s} (2)'.format(' ',self.__wholeNum,self.__wholeNumBin))
-
+    
+    
+    # convert dec num to bin
+    def decNum2Bin(self):
+        tempFloat = self.__decNum
+        decNumLen = len(str(tempFloat)) - len(str(self.__wholeNum)) - 1
+        for i in range(-1,-abs(decNumLen),-1):
+            #tempFloat = tempFloat * pow(2,-1 * i)
+            print(i)
 
 
 
@@ -132,6 +145,7 @@ def main():
     obj1.splitInputNum(number=math.sin(math.radians(1)))
     obj1.getSign()
     obj1.wholeNum2Bin()
+    obj1.decNum2Bin()
     #for i in range(0,91,1):
     #    # val = Decimal(math.sin(math.radians(i)))
     #    print('Input({:^2d}) ----> {:<60f} {:>3d}'.format(i,val,len(str(val))))
