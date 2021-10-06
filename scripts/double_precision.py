@@ -27,6 +27,8 @@ class DoublePrecision():
     __wholeNum = int
     __decNum = float
     __binaryPrecision = int
+    __wholeNumBin = str
+    __decNumBin = str
     
     # ------------------------------------------- Functions
     # constructor
@@ -38,6 +40,8 @@ class DoublePrecision():
         self.__dpSign = ''
         self.__wholeNum = 0
         self.__decNum = 0.0
+        self.__wholeNumBin = '0b'
+        self.__decNumBin = '0b'
     
     
     # setup arguments for class
@@ -92,13 +96,27 @@ class DoublePrecision():
             self.__decNum = mp.mpf(self.__decNum)
         else:
             self.__wholeNum = 0
-            self.__decNum = mp.mpf(self.__decNum)
+            self.__decNum = mp.mpf(self.__inputNum)
         # ---------- print debugging
         if self.__myargs.verbose:
             print('{:<5s}---- Whole num = [{:d}] Decimal num = [{:}]'
                 .format(' ',self.__wholeNum,self.__decNum))
             print('{:<5s}---- Binary Precision = {:<2d} Decimal Places = {:<2d}'
                 .format(' ',mp.prec,mp.dps))
+    
+    
+    # convert the input num to binary
+    def wholeNum2Bin(self):
+        if self.__wholeNum > 0:
+            self.__wholeNumBin = bin(self.__wholeNum)
+        else:
+            self.__wholeNumBin = '0b0'
+        # ---------- print verbosity
+        if self.__myargs.verbose:
+            print('{:^5s}---- {:<10d} (10) ---> {:<10s} (2)'.format(' ',self.__wholeNum,self.__wholeNumBin))
+
+
+
 
 
 # =============================================================================
@@ -110,8 +128,10 @@ def main():
     
     obj1 = DoublePrecision()
     obj1.setArguments()
-    obj1.splitInputNum(number=math.pi)
+    #obj1.splitInputNum(number=math.pi)
+    obj1.splitInputNum(number=math.sin(math.radians(1)))
     obj1.getSign()
+    obj1.wholeNum2Bin()
     #for i in range(0,91,1):
     #    # val = Decimal(math.sin(math.radians(i)))
     #    print('Input({:^2d}) ----> {:<60f} {:>3d}'.format(i,val,len(str(val))))
