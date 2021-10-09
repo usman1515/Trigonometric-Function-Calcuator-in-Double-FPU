@@ -29,6 +29,8 @@ class DoublePrecision():
     __decNum = float
     __wholeNumBin = str
     __decNumBin = str
+    __decPlaces = int
+    
     
     # ------------------------------------------- Functions
     # constructor
@@ -42,6 +44,7 @@ class DoublePrecision():
         self.__decNum = 0.0
         self.__wholeNumBin = '0b'
         self.__decNumBin = '0b'
+        self.__decPlaces = 0
     
     
     # setup arguments for class
@@ -97,7 +100,7 @@ class DoublePrecision():
         else:
             self.__wholeNum = 0
             self.__decNum = mp.mpf(self.__inputNum)
-        # ---------- print debugging
+        # ---------- print verbosity
         if self.__myargs.verbose:
             print('{:<5s}---- Whole num = [{:d}] Decimal num = [{:}]'
                 .format(' ',self.__wholeNum,self.__decNum))
@@ -107,7 +110,29 @@ class DoublePrecision():
     
     # convert bin num to base 2 scientific notation
     def base2Scientific(self):
-        pass
+        power = 1
+        tempDecNum = 0
+        if self.__inputNum > 1.0:
+            tempDecNum = self.__wholeNum
+            while tempDecNum != 1.0:
+                tempDecNum = int(self.__wholeNum / (2**abs(power)))
+                # ---------- print debugging
+                if self.__myargs.debug:
+                    print('{:<5s}-------- {:} / 2^({:2d}) = {:}'.format(' ',self.__decNum,abs(power),tempDecNum))
+                power += 1
+            self.__decPlaces = abs(power - 1)
+        else:
+            tempDecNum = self.__decNum
+            while tempDecNum <= 1.0:
+                tempDecNum = self.__decNum / (2**-abs(power))
+                # ---------- print debugging
+                if self.__myargs.debug:
+                    print('{:<5s}-------- {:} / 2^({:2d}) = {:}'.format(' ',self.__decNum,-abs(power),tempDecNum))
+                power += 1
+            self.__decPlaces = -abs(power - 1)
+        # ---------- print verbosity
+        if self.__myargs.verbose:
+            print('{:^5s}---- {:<21s}{:<5d}'.format(' ','Decimal Places = ',self.__decPlaces))
     
     
     # convert the input num to binary
@@ -144,8 +169,9 @@ def main():
     #obj1.splitInputNum(number=math.pi)
     obj1.splitInputNum(number=math.sin(math.radians(1)))
     obj1.getSign()
-    obj1.wholeNum2Bin()
-    obj1.decNum2Bin()
+    obj1.base2Scientific()
+    #obj1.wholeNum2Bin()
+    #obj1.decNum2Bin()
     #for i in range(0,91,1):
     #    # val = Decimal(math.sin(math.radians(i)))
     #    print('Input({:^2d}) ----> {:<60f} {:>3d}'.format(i,val,len(str(val))))
