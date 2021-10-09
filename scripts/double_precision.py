@@ -32,6 +32,7 @@ class DoublePrecision():
     __decPlaces = int
     __dpExponent = int
     __dpExponentBin = str
+    __dpMantissa = str
     
     
     # ------------------------------------------- Functions
@@ -49,6 +50,7 @@ class DoublePrecision():
         self.__decPlaces = 0
         self.__dpExponent = 1023
         self.__dpExponentBin = ''
+        self.__dpMantissa = ''
     
     
     # setup arguments for class
@@ -171,11 +173,30 @@ class DoublePrecision():
     # calculate the exponent bias and display in binary format
     def getexpoBias(self):
         self.__dpExponent += self.__decPlaces
-        self.__dpExponentBin = '0b' + bin(self.__dpExponent).replace('0b','').rjust(11,'0')
+        self.__dpExponentBin = '0b' + bin(self.__dpExponent).replace('0b','').zfill(11)
         # ---------- print verbosity
         if self.__myargs.verbose:
             print('{:^5s}---- {:<s}{:<5d} (10) ---> {:<15s} (2)'
                     .format(' ','Exponent bias = ',int(self.__dpExponent),self.__dpExponentBin))
+    
+    
+    # caculate the mantissa and display in binary format
+    def getMantissa(self):
+        tempMantissa = str
+        # ---------- check if num >= 1.0
+        # ---------- check if num >= 1.0
+        if self.__wholeNum >= 1.0:
+            pass        
+        # ---------- check if num <= 1.0
+        else:
+            tempMantissa = self.__decNumBin.replace('0b','')
+            tempMantissa = '0b' + tempMantissa[abs(self.__decPlaces) - 1:]
+            self.__dpMantissa = tempMantissa
+            # ---------- print verbosity
+            if self.__myargs.verbose:
+                print('{:^5s}---- {:<21s}{:<54s} (2) ({:^2d})'
+                        .format(' ','Mantissa = ',self.__dpMantissa,len(self.__dpMantissa)))
+
 
 
 
@@ -195,6 +216,7 @@ def main():
     obj1.wholeNum2Bin()
     obj1.decNum2Bin()
     obj1.getexpoBias()
+    obj1.getMantissa()
     #for i in range(0,91,1):
     #    # val = Decimal(math.sin(math.radians(i)))
     #    print('Input({:^2d}) ----> {:<60f} {:>3d}'.format(i,val,len(str(val))))
