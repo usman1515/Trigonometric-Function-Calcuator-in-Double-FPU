@@ -30,6 +30,8 @@ class DoublePrecision():
     __wholeNumBin = str
     __decNumBin = str
     __decPlaces = int
+    __dpExponent = int
+    __dpExponentBin = str
     
     
     # ------------------------------------------- Functions
@@ -45,6 +47,8 @@ class DoublePrecision():
         self.__wholeNumBin = '0b'
         self.__decNumBin = '0b'
         self.__decPlaces = 0
+        self.__dpExponent = 1023
+        self.__dpExponentBin = ''
     
     
     # setup arguments for class
@@ -143,17 +147,35 @@ class DoublePrecision():
             self.__wholeNumBin = '0b0'
         # ---------- print verbosity
         if self.__myargs.verbose:
-            print('{:^5s}---- {:<10d} (10) ---> {:<10s} (2)'.format(' ',self.__wholeNum,self.__wholeNumBin))
+            print('{:^5s}---- {:<21d} (10) ---> {:<10s} (2)'.format(' ',self.__wholeNum,self.__wholeNumBin))
     
     
     # convert dec num to bin
     def decNum2Bin(self):
         tempFloat = self.__decNum
-        decNumLen = len(str(tempFloat)) - len(str(self.__wholeNum)) - 1
-        for i in range(-1,-abs(decNumLen),-1):
-            #tempFloat = tempFloat * pow(2,-1 * i)
-            print(i)
-
+        for power in range(1,52 + abs(self.__decPlaces),1):
+            tempFloat = tempFloat * 2
+            self.__decNumBin += str(int(tempFloat))
+            # ---------- print debugging
+            if self.__myargs.debug:
+                print('{:<5s}-------- {:} / 2^({:3d}) = {:^1d}'.format(' ',self.__decNum,-abs(power),int(tempFloat)))
+            if tempFloat >= 1.0:
+                tempFloat -= 1
+                #print('new temp float: ',tempFloat)
+        #print(self.__decNumBin,len(self.__decNumBin))
+        # ---------- print verbosity
+        if self.__myargs.verbose:
+            print('{:^5s}---- {:<21s} (10) ---> {:<60s} (2)'.format(' ',str(self.__decNum),self.__decNumBin))
+    
+    
+    # calculate the exponent bias and display in binary format
+    def getexpoBias(self):
+        self.__dpExponent += self.__decPlaces
+        self.__dpExponentBin = '0b' + bin(self.__dpExponent).replace('0b','').rjust(11,'0')
+        # ---------- print verbosity
+        if self.__myargs.verbose:
+            print('{:^5s}---- {:<s}{:<5d} (10) ---> {:<15s} (2)'
+                    .format(' ','Exponent bias = ',int(self.__dpExponent),self.__dpExponentBin))
 
 
 
@@ -167,11 +189,12 @@ def main():
     obj1 = DoublePrecision()
     obj1.setArguments()
     #obj1.splitInputNum(number=math.pi)
-    obj1.splitInputNum(number=math.sin(math.radians(1)))
+    obj1.splitInputNum(number=math.sin(math.radians(2)))
     obj1.getSign()
     obj1.base2Scientific()
-    #obj1.wholeNum2Bin()
-    #obj1.decNum2Bin()
+    obj1.wholeNum2Bin()
+    obj1.decNum2Bin()
+    obj1.getexpoBias()
     #for i in range(0,91,1):
     #    # val = Decimal(math.sin(math.radians(i)))
     #    print('Input({:^2d}) ----> {:<60f} {:>3d}'.format(i,val,len(str(val))))
