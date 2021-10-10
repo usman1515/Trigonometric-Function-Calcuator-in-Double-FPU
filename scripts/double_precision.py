@@ -33,6 +33,8 @@ class DoublePrecision():
     __dpExponent = int
     __dpExponentBin = str
     __dpMantissa = str
+    dpBinNum = str
+    dpHexNum = str
     
     
     # ------------------------------------------- Functions
@@ -51,6 +53,8 @@ class DoublePrecision():
         self.__dpExponent = 1023
         self.__dpExponentBin = ''
         self.__dpMantissa = ''
+        self.dpBinNum = ''
+        self.dpHexNum = ''
     
     
     # setup arguments for class
@@ -79,13 +83,13 @@ class DoublePrecision():
             self.__dpSign = '0'
             # print verbosity
             if self.__myargs.verbose:
-                print('{:^5s}---- {:<21s}{:<5s}'.format(' ','Sign bit = ',"1'b0"))
+                print('{:^5s}---- {:<22s}{:<5s}'.format(' ','Sign bit = ',"1'b0"))
         else:
             self.__spSign = '1'
             self.__dpSign = '1'
             # print verbosity
             if self.__myargs.verbose:
-                print('{:^5s}---- {:<21s}{:<5s}'.format(' ','Sign bit = ',"1'b1"))
+                print('{:^5s}---- {:<22s}{:<5s}'.format(' ','Sign bit = ',"1'b1"))
     
     
     # split input number into whole and dec
@@ -97,7 +101,6 @@ class DoublePrecision():
             self.__inputNum = mp.mpf(self.__myargs.inputvalue)
         else:
             self.__inputNum = mp.mpf(number)
-        print('Input Number:   {0} (10)'.format(self.__inputNum))
         # ---------- split input num
         if self.__inputNum >= 1.0:
             self.__decNum, self.__wholeNum = math.modf(self.__inputNum)
@@ -108,10 +111,11 @@ class DoublePrecision():
             self.__decNum = mp.mpf(self.__inputNum)
         # ---------- print verbosity
         if self.__myargs.verbose:
-            print('{:<5s}---- Whole num = [{:d}] Decimal num = [{:}]'
+            print('{:<5s}---- Input Number:   {:} (10)'.format(' ',self.__inputNum))
+            print('{:<5s}---- Whole num = {:d} | Decimal num = {:}'
                 .format(' ',self.__wholeNum,self.__decNum))
-            print('{:<5s}---- Binary Precision = {:<2d} Decimal Places = {:<2d}'
-                .format(' ',mp.prec,mp.dps))
+            #print('{:<5s}---- Binary Precision = {:<2d} Decimal Places = {:<2d}'
+            #    .format(' ',mp.prec,mp.dps))
     
     
     # convert bin num to base 2 scientific notation
@@ -135,7 +139,7 @@ class DoublePrecision():
                 if self.__myargs.debug:
                     print('{:<5s}-------- {:} / 2^({:2d}) = {:}'.format(' ',self.__decNum,-abs(power),tempDecNum))
                 power += 1
-            self.__decPlaces = -abs(power - 1)
+            self.__decPlaces = -abs(power) + 1
         # ---------- print verbosity
         if self.__myargs.verbose:
             print('{:^5s}---- {:<21s}{:<5d}'.format(' ','Decimal Places = ',self.__decPlaces))
@@ -155,7 +159,7 @@ class DoublePrecision():
     # convert dec num to bin
     def decNum2Bin(self):
         tempFloat = self.__decNum
-        for power in range(1,52 + abs(self.__decPlaces),1):
+        for power in range(0,52 + abs(self.__decPlaces),1):
             tempFloat = tempFloat * 2
             self.__decNumBin += str(int(tempFloat))
             # ---------- print debugging
@@ -190,14 +194,27 @@ class DoublePrecision():
         # ---------- check if num <= 1.0
         else:
             tempMantissa = self.__decNumBin.replace('0b','')
-            tempMantissa = '0b' + tempMantissa[abs(self.__decPlaces) - 1:]
-            self.__dpMantissa = tempMantissa
+            tempMantissa = tempMantissa[abs(self.__decPlaces) - 1:]
+            self.__dpMantissa = tempMantissa.replace('1','',1)
             # ---------- print verbosity
             if self.__myargs.verbose:
-                print('{:^5s}---- {:<21s}{:<54s} (2) ({:^2d})'
+                print('{:^5s}---- {:<21s} 1.{:<54s} (2) ({:^2d})'
                         .format(' ','Mantissa = ',self.__dpMantissa,len(self.__dpMantissa)))
-
-
+    
+    
+    # combine all parts
+    def combineAll(self):
+        # ---------- for double precision
+        self.__dpExponentBin = self.__dpExponentBin.replace('0b','')
+        self.__dpMantissa = self.__dpMantissa.replace('0b','')
+        #   print(self.__dpSign,self.__dpExponentBin,self.__dpMantissa,len(self.__dpSign),len(self.__dpExponentBin),len(self.__dpMantissa))
+        
+        self.dpBinNum = self.__dpSign + self.__dpExponentBin + self.__dpMantissa
+        self.dpHexNum = hex(int(self.dpBinNum,2))
+        # ---------- print debugging
+        if self.__myargs.debug:
+            print('Sign = {:<1s} | Exponent = {:<11s} (2) | Mantissa = {:<52s}'
+                    .format(self.__dpSign,self.__dpExponentBin,self.__dpMantissa))
 
 
 # =============================================================================
@@ -209,14 +226,16 @@ def main():
     
     obj1 = DoublePrecision()
     obj1.setArguments()
-    #obj1.splitInputNum(number=math.pi)
-    obj1.splitInputNum(number=math.sin(math.radians(2)))
+    number=math.sin(math.radians(89))
+    obj1.splitInputNum(number)
     obj1.getSign()
     obj1.base2Scientific()
     obj1.wholeNum2Bin()
     obj1.decNum2Bin()
     obj1.getexpoBias()
     obj1.getMantissa()
+    obj1.combineAll()
+    
     #for i in range(0,91,1):
     #    # val = Decimal(math.sin(math.radians(i)))
     #    print('Input({:^2d}) ----> {:<60f} {:>3d}'.format(i,val,len(str(val))))
