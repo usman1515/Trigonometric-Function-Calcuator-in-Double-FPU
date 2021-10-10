@@ -217,16 +217,10 @@ class DoublePrecision():
                     .format(self.__dpSign,self.__dpExponentBin,self.__dpMantissa))
 
 
-# =============================================================================
-# ================================= End Class =================================
-# =============================================================================
-
-def main():
-    
-    
+# global main function
+def dec2ieeefp(number):
     obj1 = DoublePrecision()
     obj1.setArguments()
-    number=math.sin(math.radians(89))
     obj1.splitInputNum(number)
     obj1.getSign()
     obj1.base2Scientific()
@@ -235,10 +229,19 @@ def main():
     obj1.getexpoBias()
     obj1.getMantissa()
     obj1.combineAll()
-    
-    #for i in range(0,91,1):
-    #    # val = Decimal(math.sin(math.radians(i)))
-    #    print('Input({:^2d}) ----> {:<60f} {:>3d}'.format(i,val,len(str(val))))
+    print('{:<21s} (10)  ---->  {:<18s} (16)'.format(str(mp.mpf(number)),obj1.dpHexNum))
+    return [obj1.dpHexNum,obj1.dpBinNum]
+
+
+# =============================================================================
+# ================================= End Class =================================
+# =============================================================================
+
+def main():
+    for i in range(1,89,1):
+        number=math.sin(math.radians(i))    
+        [dpHexNum, dpBinNum] = dec2ieeefp(number)
+
 
 if __name__ == '__main__':
     main()
