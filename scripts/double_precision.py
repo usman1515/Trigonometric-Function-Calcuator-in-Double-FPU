@@ -10,7 +10,6 @@ https://class.ece.iastate.edu/arun/CprE281_F05/ieee754/ie5.html
 from mpmath import mp
 import argparse
 import math
-import re
 import os
 os.system('clear')
 
@@ -67,8 +66,6 @@ class DoublePrecision():
         # ---------- list of all possible args for Double Precision
         parser.add_argument('-num','--inputvalue',
                         type=float,default=0,metavar='',required=False,nargs='?',help='Input user defined decimal value')
-        parser.add_argument('-sign','--signbit',
-                            type=int,default=0,metavar='',required=False,help='Include sign bit in hex num')
         parser.add_argument('-v','--verbose',
                             type=int,default=0,metavar='',required=False,nargs='?',help='print verbose')
         parser.add_argument('-d','--debug',
@@ -238,9 +235,8 @@ def dec2ieeefp(number):
 # =============================================================================
 
 def main():
-    for i in range(1,89,1):
-        number=math.sin(math.radians(i))    
-        [dpHexNum, dpBinNum] = dec2ieeefp(number)
+    number=math.sin(math.radians(1))
+    [dpHexNum, dpBinNum] = dec2ieeefp(number)
 
 
 if __name__ == '__main__':
