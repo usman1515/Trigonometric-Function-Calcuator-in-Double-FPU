@@ -2,6 +2,7 @@
 
 # -------------------------------------------- scripts dir and paths
 PRJ_DIR 		:= $(realpath .)
+PATH_PYTHON1 	:= $(PRJ_DIR)/scripts/double_precision.py
 PATH_DIVIDER	:= $(PRJ_DIR)/scripts/divider.sh
 PATH_SINE 		:= $(PRJ_DIR)/scripts/sine.sh
 PATH_COSINE 	:= $(PRJ_DIR)/scripts/cosine.sh
@@ -17,6 +18,8 @@ help:
 	@ echo ---------------------- Targets defined in the MakeFile ----------------------
 	@ echo -----------------------------------------------------------------------------
 	@ echo
+	@ echo "dfpu:		convert dec float to IEEE 754 double hex"
+	@ echo " "
 	@ echo "divider:	Simulate Divider 	module"
 	@ echo "sine:		Simulate Sine 		module"
 	@ echo "cosine:		Simulate Cosine 	module"
@@ -29,10 +32,20 @@ help:
 	@ echo
 	@ echo -----------------------------------------------------------------------------
 	@ echo -----------------------------------------------------------------------------
+	@ echo " "
 
-default:
+NUMBER := 
+VERBOSE := 0
+DEBUG := 0
+
+default: help
 	$(info $(PRJ_DIR))
-	$(info $(PATH_DIVIDER))
+
+dfpu:
+	python3 $(PATH_PYTHON1) \
+	--inputvalue $(NUMBER) \
+	--verbose $(VERBOSE) \
+	--debug $(DEBUG)
 
 divider:
 	bash $(PATH_DIVIDER)
