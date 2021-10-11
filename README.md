@@ -9,6 +9,7 @@
 ##  Directory Structure
 ```
 .
+├── bin
 ├── CHANGELOG.md
 ├── docs
 ├── LICENSE
