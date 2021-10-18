@@ -6,7 +6,7 @@ module tb_cosine;
 // -------------------------------------------------------- parameters
 localparam T = 2;
 integer min1 = `DATA_WIDTH'd0;
-integer max1 = `DATA_WIDTH'd360;
+integer max1 = `DATA_WIDTH'd90;
 integer unsigned num1 = 0;
 
 // -------------------------------------------------------- IO
@@ -51,7 +51,7 @@ initial begin
             quadrant = 1'b0;
             data_in = num1;
         end
-        #T $monitor("Input angle [%3d] | Sign [%1b] | Sine DFPU value = %16h",data_in,data_out[63],data_out);
+        #T $monitor("Input angle [%3d] | Sign [%1b] | Cosine DFPU value = %16h",data_in,data_out[63],data_out);
         num1 = num1 + 1;
     end
     @(posedge clk)  reset_n = 1'b0;
@@ -63,10 +63,10 @@ initial begin
         @(posedge clk) begin
             reset_n = 1'b1;
             en_cosine = 1'b1;
-            quadrant = 1'b1; 
+            quadrant = 1'b0; 
             data_in = min1 + {$random} % (max1-min1);
         end
-        #T $display("Input angle [%3d] | Sign [%1b] | Sine DFPU value = %16h",data_in,data_out[63],data_out);
+        #T $display("Input angle [%3d] | Sign [%1b] | Cosine DFPU value = %16h",data_in,data_out[63],data_out);
     end
     
     $display("-----------------------------------------------------------------\n");

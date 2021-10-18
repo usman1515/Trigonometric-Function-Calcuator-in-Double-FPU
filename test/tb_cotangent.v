@@ -6,7 +6,7 @@ module tb_cotangent;
 // -------------------------------------------------------- parameters
 localparam T = 2;
 integer min1 = `DATA_WIDTH'd0;
-integer max1 = `DATA_WIDTH'd360;
+integer max1 = `DATA_WIDTH'd90;
 integer unsigned num1 = 0;
 
 // -------------------------------------------------------- IO

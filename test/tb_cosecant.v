@@ -6,7 +6,7 @@ module tb_cosecant;
 // -------------------------------------------------------- parameters
 localparam T = 2;
 integer min1 = `DATA_WIDTH'd0;
-integer max1 = `DATA_WIDTH'd360;
+integer max1 = `DATA_WIDTH'd90;
 integer unsigned num1 = 0;
 
 // -------------------------------------------------------- IO
@@ -63,7 +63,7 @@ initial begin
         @(posedge clk) begin
             reset_n = 1'b1;
             en_cosecant = 1'b1;
-            quadrant = 1'b1; 
+            quadrant = 1'b0; 
             data_in = min1 + {$random} % (max1-min1);
         end
         #T $display("Input angle [%3d] | Sign [%1b] | Cosecant DFPU value = %16h",data_in,data_out[63],data_out);
