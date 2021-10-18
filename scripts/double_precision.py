@@ -156,16 +156,30 @@ class DoublePrecision():
     # convert dec num to bin
     def decNum2Bin(self):
         tempFloat = self.__decNum
-        for power in range(0,52 + abs(self.__decPlaces),1):
-            tempFloat = tempFloat * 2
-            self.__decNumBin += str(int(tempFloat))
-            # ---------- print debugging
-            if self.__myargs.debug:
-                print('{:<5s}-------- {:} / 2^({:3d}) = {:^1d}'.format(' ',self.__decNum,-abs(power),int(tempFloat)))
-            if tempFloat >= 1.0:
-                tempFloat -= 1
-                #print('new temp float: ',tempFloat)
-        #print(self.__decNumBin,len(self.__decNumBin))
+        if self.__inputNum >= 2.0:
+            for power in range(0,52 - abs(self.__decPlaces),1):
+                tempFloat = tempFloat * 2
+                self.__decNumBin += str(int(tempFloat))
+                # ---------- print debugging
+                if self.__myargs.debug:
+                    print('{:<5s}-------- {:} / 2^({:3d}) = {:^1d}'.format(' ',self.__decNum,-abs(power),int(tempFloat)))
+                if tempFloat >= 1.0:
+                    tempFloat -= 1
+                    #print('new temp float: ',tempFloat)
+            #print(self.__decNumBin,len(self.__decNumBin))
+            self.__decNumBin = self.__wholeNumBin + self.__decNumBin
+            self.__decNumBin = '0b' + self.__decNumBin.replace('0b','').replace('1','',1)
+        else:
+            for power in range(0,52 + abs(self.__decPlaces),1):
+                tempFloat = tempFloat * 2
+                self.__decNumBin += str(int(tempFloat))
+                # ---------- print debugging
+                if self.__myargs.debug:
+                    print('{:<5s}-------- {:} / 2^({:3d}) = {:^1d}'.format(' ',self.__decNum,-abs(power),int(tempFloat)))
+                if tempFloat >= 1.0:
+                    tempFloat -= 1
+                    #print('new temp float: ',tempFloat)
+            #print(self.__decNumBin,len(self.__decNumBin))
         # ---------- print verbosity
         if self.__myargs.verbose:
             print('{:^5s}---- {:<21s} (10) ---> {:<60s} (2)'.format(' ',str(self.__decNum),self.__decNumBin))
@@ -184,19 +198,18 @@ class DoublePrecision():
     # caculate the mantissa and display in binary format
     def getMantissa(self):
         tempMantissa = str
-        # ---------- check if num >= 1.0
+        tempMantissa = self.__decNumBin.replace('0b','')
         # ---------- check if num >= 1.0
         if self.__wholeNum >= 1.0:
-            pass        
+            self.__dpMantissa = tempMantissa
         # ---------- check if num <= 1.0
         else:
-            tempMantissa = self.__decNumBin.replace('0b','')
             tempMantissa = tempMantissa[abs(self.__decPlaces) - 1:]
             self.__dpMantissa = tempMantissa.replace('1','',1)
-            # ---------- print verbosity
-            if self.__myargs.verbose:
-                print('{:^5s}---- {:<21s} 1.{:<54s} (2) ({:^2d})'
-                        .format(' ','Mantissa = ',self.__dpMantissa,len(self.__dpMantissa)))
+        # ---------- print verbosity
+        if self.__myargs.verbose:
+            print('{:^5s}---- {:<21s} 1.{:<54s} (2) ({:^2d})'
+                    .format(' ','Mantissa = ',self.__dpMantissa,len(self.__dpMantissa)))
     
     
     # combine all parts
@@ -226,7 +239,7 @@ def dec2ieeefp(number):
     obj1.getexpoBias()
     obj1.getMantissa()
     obj1.combineAll()
-    print('{:<21s} (10)  ---->  {:<18s} (16)'.format(str(mp.mpf(number)),obj1.dpHexNum))
+    # print('{:<21s} (10)  ---->  {:<18s} (16)'.format(str(mp.mpf(number)),obj1.dpHexNum))
     return [obj1.dpHexNum,obj1.dpBinNum]
 
 
@@ -235,8 +248,17 @@ def dec2ieeefp(number):
 # =============================================================================
 
 def main():
-    number=math.sin(math.radians(1))
-    [dpHexNum, dpBinNum] = dec2ieeefp(number)
+    # ---------- consecutive values
+    for i in range(46,90,1):
+        number = mp.cot(mp.radians(i))
+        [dpHexNum, dpBinNum] = dec2ieeefp(number)
+        print('{:>2d}  =  {:<21s} (10)  ---->  {:<18s} (16)'.format(i,str(number),dpHexNum))
+    
+    # ---------- indiviual value
+    #   i = 45
+    #   number=mp.cot(mp.radians(i))
+    #   [dpHexNum, dpBinNum] = dec2ieeefp(number)
+    #   print('\n\n\ndeg({:>2d})  =  {:<21s} (10)  ---->  {:<18s} (16)'.format(i,str(number),dpHexNum))
 
 
 if __name__ == '__main__':
