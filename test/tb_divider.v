@@ -6,7 +6,7 @@ module tb_divider;
 // -------------------------------------------------------- parameters
 localparam T = 2;
 integer min1 = `DATA_WIDTH'd0;
-integer max1 = `DATA_WIDTH'd720;
+integer max1 = `DATA_WIDTH'hffffffff;    //'hffffffff
 integer num1 = 0;
 
 // -------------------------------------------------------- IO
@@ -23,7 +23,7 @@ divider DUT_divider(
     .reset_n    (reset_n    ),
     .en_divider (en_divider ),
     .data_in    (data_in    ),
-    .quadrant   (quadrant   ),
+    //.quadrant   (quadrant   ),
     .data_out   (data_out   )
 );
 
@@ -50,25 +50,23 @@ initial begin
             en_divider = 1'b1;
             data_in = min1 + {$random} % (max1-min1);
         end
-        #T $display("Input angle [%3d] | Quadrant [%2d] | Data output [%3d]",data_in,quadrant,data_out);
+        #T $display("Input angle [%10d] | Data output [%3d]",data_in,data_out);
     end
-    
-    // --------------------------------------- check for all input values
-    $display("-----------------------------------------------------------------\n");
-    repeat(145) begin
-        @(posedge clk) begin
-            reset_n = 1'b1;
-            en_divider = 1'b1;
-            data_in = num1;
-        end
-        #T $display("Input angle [%3d] | Quadrant [%2d] | Data output [%3d]",data_in,quadrant,data_out);
-        num1 = num1 + 5;
-    end
-    @(posedge clk)  reset_n = 1'b0;
-    @(posedge clk)  reset_n = 1'b1;
-    
-    $display("-----------------------------------------------------------------\n");
-    $finish;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    $stop;
 end
 
 // -------------------------------------------------------- dump vcd
