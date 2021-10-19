@@ -103,9 +103,13 @@ class DoublePrecision():
             self.__decNum, self.__wholeNum = math.modf(self.__inputNum)
             self.__wholeNum = int(self.__wholeNum)
             self.__decNum = mp.mpf(self.__decNum)
-        else:
+        elif self.__inputNum >= 0.0 and self.__inputNum < 1.0:
             self.__wholeNum = 0
             self.__decNum = mp.mpf(self.__inputNum)
+        elif self.__inputNum < 0.0:
+            self.__decNum, self.__wholeNum = math.modf(abs(self.__inputNum))
+            self.__wholeNum = int(self.__wholeNum)
+            self.__decNum = mp.mpf(self.__decNum)
         # ---------- print verbosity
         if self.__myargs.verbose:
             print('{:<5s}---- Input Number:   {:} (10)'.format(' ',self.__inputNum))
@@ -249,7 +253,7 @@ def dec2ieeefp(number):
 
 def main():
     # ---------- consecutive values
-    for i in range(46,90,1):
+    for i in range(1,90,1):
         number = mp.cot(mp.radians(i))
         [dpHexNum, dpBinNum] = dec2ieeefp(number)
         print('{:>2d}  =  {:<21s} (10)  ---->  {:<18s} (16)'.format(i,str(number),dpHexNum))
