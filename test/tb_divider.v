@@ -5,9 +5,6 @@ module tb_divider;
 
 // -------------------------------------------------------- parameters
 localparam T = 2;
-integer min1 = `DATA_WIDTH'd0;
-integer max1 = `DATA_WIDTH'd720;
-integer num1 = 0;
 
 // -------------------------------------------------------- IO
 reg     clk;
@@ -42,32 +39,58 @@ initial begin
         reset_n = 1'b1;
     end
     
-    // --------------------------------------- send 20 random -ve inputs
+    // --------------------------------------- send 20 random inputs > 360
+    @(posedge clk) reset_n = 1'b0;
+	@(posedge clk) reset_n = 1'b1;
     $display("-----------------------------------------------------------------\n");
     repeat(20) begin
         @(posedge clk) begin
             reset_n = 1'b1;
             en_divider = 1'b1;
-            data_in = min1 + {$random} % (max1-min1);
+            data_in = `DATA_WIDTH'd360 + {$random} % (`DATA_WIDTH'hffffffff - `DATA_WIDTH'd360);
         end
-        #T $display("Input angle [%3d] | Quadrant [%2d] | Data output [%3d]",data_in,quadrant,data_out);
+        #T $display("Input angle [%10d] | Quadrant [%2d] | Data output [%3d]",data_in,quadrant,data_out);
     end
     
-    // --------------------------------------- check for all input values
+    // --------------------------------------- send 20 random inputs 181 < x < 360
+    @(posedge clk) reset_n = 1'b0;
+	@(posedge clk) reset_n = 1'b1;
     $display("-----------------------------------------------------------------\n");
-    repeat(145) begin
+    repeat(20) begin
         @(posedge clk) begin
             reset_n = 1'b1;
             en_divider = 1'b1;
-            data_in = num1;
+            data_in = `DATA_WIDTH'd181 + {$random} % (`DATA_WIDTH'd360 - `DATA_WIDTH'd181);
         end
         #T $display("Input angle [%3d] | Quadrant [%2d] | Data output [%3d]",data_in,quadrant,data_out);
-        num1 = num1 + 5;
     end
-    @(posedge clk)  reset_n = 1'b0;
-    @(posedge clk)  reset_n = 1'b1;
     
+    // --------------------------------------- send 20 random inputs 91 < x < 180
+    @(posedge clk) reset_n = 1'b0;
+	@(posedge clk) reset_n = 1'b1;
     $display("-----------------------------------------------------------------\n");
+    repeat(20) begin
+        @(posedge clk) begin
+            reset_n = 1'b1;
+            en_divider = 1'b1;
+            data_in = `DATA_WIDTH'd91 + {$random} % (`DATA_WIDTH'd180 - `DATA_WIDTH'd91);
+        end
+        #T $display("Input angle [%3d] | Quadrant [%2d] | Data output [%3d]",data_in,quadrant,data_out);
+    end
+    
+    // --------------------------------------- send 20 random inputs < 90
+    @(posedge clk) reset_n = 1'b0;
+	@(posedge clk) reset_n = 1'b1;
+    $display("-----------------------------------------------------------------\n");
+    repeat(20) begin
+        @(posedge clk) begin
+            reset_n = 1'b1;
+            en_divider = 1'b1;
+            data_in = `DATA_WIDTH'd0 + {$random} % (`DATA_WIDTH'd90 - `DATA_WIDTH'd0);
+        end
+        #T $display("Input angle [%3d] | Quadrant [%2d] | Data output [%3d]",data_in,quadrant,data_out);
+    end
+    
     $finish;
 end
 
